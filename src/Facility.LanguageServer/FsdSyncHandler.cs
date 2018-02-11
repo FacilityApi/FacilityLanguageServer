@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Facility.Definition;
 using Facility.Definition.Fsd;
@@ -11,12 +13,11 @@ using OmniSharp.Extensions.LanguageServer.Server;
 
 namespace Facility.LanguageServer
 {
-	public sealed class FacilityServiceDefinitionDocumentHandler : ITextDocumentSyncHandler
+	sealed class FsdSyncHandler : FsdRequestHandler, ITextDocumentSyncHandler
 	{
-		public FacilityServiceDefinitionDocumentHandler(ILanguageServer router)
+		public FsdSyncHandler(ILanguageServer router, IDictionary<Uri, ServiceInfo> serviceInfos)
+			: base(router, serviceInfos)
 		{
-			m_router = router;
-
 			m_parser = new FsdParser();
 		}
 
@@ -28,7 +29,6 @@ namespace Facility.LanguageServer
 
 		public void SetCapability(SynchronizationCapability capability)
 		{
-			m_capability = capability;
 		}
 
 		public TextDocumentAttributes GetTextDocumentAttributes(Uri uri)
@@ -38,19 +38,20 @@ namespace Facility.LanguageServer
 
 		public async Task Handle(DidOpenTextDocumentParams notification)
 		{
-			await Parse(notification.TextDocument.Uri, notification.TextDocument.Text).ConfigureAwait(false);
+			await ParseAsync(notification.TextDocument.Uri, notification.TextDocument.Text).ConfigureAwait(false);
 		}
 
 		public async Task Handle(DidChangeTextDocumentParams notification)
 		{
 			foreach (var change in notification.ContentChanges)
 			{
-				await Parse(notification.TextDocument.Uri, change.Text).ConfigureAwait(false);
+				await ParseAsync(notification.TextDocument.Uri, change.Text).ConfigureAwait(false);
 			}
 		}
 
 		public Task Handle(DidCloseTextDocumentParams notification)
 		{
+			SetService(notification.TextDocument.Uri, null);
 			return Task.CompletedTask;
 		}
 
@@ -63,7 +64,7 @@ namespace Facility.LanguageServer
 		{
 			return new TextDocumentRegistrationOptions
 			{
-				DocumentSelector = m_documentSelector
+				DocumentSelector = DocumentSelector
 			};
 		}
 
@@ -71,7 +72,7 @@ namespace Facility.LanguageServer
 		{
 			return new TextDocumentChangeRegistrationOptions
 			{
-				DocumentSelector = m_documentSelector,
+				DocumentSelector = DocumentSelector,
 				SyncKind = Options.Change
 			};
 		}
@@ -80,49 +81,32 @@ namespace Facility.LanguageServer
 		{
 			return new TextDocumentSaveRegistrationOptions
 			{
-				DocumentSelector = m_documentSelector
+				DocumentSelector = DocumentSelector
 			};
 		}
 
-		private async Task Parse(Uri documentUri, string text)
+		async Task ParseAsync(Uri documentUri, string text)
 		{
 			var diagnostics = new List<Diagnostic>();
-			try
+			ServiceInfo service;
+			IReadOnlyList<ServiceDefinitionError> errors;
+			if (!m_parser.TryParseDefinition(new NamedText(documentUri.AbsoluteUri, text), out service, out errors))
 			{
-				m_parser.ParseDefinition(new NamedText(documentUri.AbsoluteUri, text));
-			}
-			catch (ServiceDefinitionException ex)
-			{
-				diagnostics.Add(new Diagnostic
+				diagnostics.AddRange(errors.Select(x => new Diagnostic
 				{
 					Severity = DiagnosticSeverity.Error,
-					Message = ex.Error,
-					Range = new Range(ToLspPosition(ex.Position), ToLspPosition(ex.Position))
-				});
+					Message = x.Message,
+					Range = new Range(new Position(x.Position), new Position(x.Position))
+				}));
 			}
-			m_router.PublishDiagnostics(new PublishDiagnosticsParams
+			SetService(documentUri, service);
+			Router.PublishDiagnostics(new PublishDiagnosticsParams
 			{
 				Uri = documentUri,
 				Diagnostics = diagnostics
 			});
 		}
 
-		private static Position ToLspPosition(NamedTextPosition position)
-		{
-			return new Position(position.LineNumber - 1, position.ColumnNumber - 1);
-		}
-
-		private readonly ILanguageServer m_router;
-		private readonly FsdParser m_parser;
-
-		private readonly DocumentSelector m_documentSelector = new DocumentSelector(
-			new DocumentFilter()
-			{
-				Pattern = "**/*.fsd",
-				Language = "fsd"
-			}
-		);
-
-		private SynchronizationCapability m_capability;
+		readonly FsdParser m_parser;
 	}
 }
