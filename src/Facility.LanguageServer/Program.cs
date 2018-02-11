@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Facility.Definition;
 using Microsoft.Extensions.Logging;
 using LangServer = OmniSharp.Extensions.LanguageServer.Server.LanguageServer;
 
@@ -17,7 +19,9 @@ namespace Facility.LanguageServer
 
 			var server = new LangServer(Console.OpenStandardInput(), Console.OpenStandardOutput(), new LoggerFactory());
 
-			server.AddHandler(new FacilityServiceDefinitionDocumentHandler(server));
+			var serviceInfos = new Dictionary<Uri, ServiceInfo>();
+			server.AddHandler(new FsdSyncHandler(server, serviceInfos));
+			server.AddHandler(new FsdDefinitionHandler(server, serviceInfos));
 
 			await server.Initialize();
 			await server.WaitForExit;
