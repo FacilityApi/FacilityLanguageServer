@@ -165,6 +165,23 @@ Task("CoveragePublish")
 		ExecuteTool("coveralls.net.exe", $@"--opencover ""{File("release/coverage.xml")}"" --full-sources --repo-token {coverallsApiKey}");
 	});
 
+Task("Zip")
+	.IsDependentOn("SourceIndex")
+	.Does(() =>
+	{
+		CreateDirectory("release");
+		var releaseVersionDirectory = Directory($"release/Facility.LanguageServer-{version}");
+		var settings = new DotNetCorePublishSettings
+		{
+			Configuration = "Release",
+			VersionSuffix = prerelease,
+			OutputDirectory = MakeAbsolute(releaseVersionDirectory)
+		};
+		DotNetCorePublish("src/Facility.LanguageServer", settings);
+		var files = GetFiles($"release/Facility.LanguageServer-{version}/**/*");
+		Zip(releaseVersionDirectory, $"release/Facility.LanguageServer-{version}.zip", files);
+	});
+
 Task("Default")
 	.IsDependentOn("Test");
 
