@@ -44,18 +44,22 @@ Task("Clean")
 	});
 
 Task("Build")
-	.IsDependentOn("Clean")
 	.Does(() =>
 	{
 		NuGetRestore(solutionFileName);
 		MSBuild(solutionFileName, settings => settings.SetConfiguration(configuration));
 	});
 
+Task("Rebuild")
+	.IsDependentOn("Clean")
+	.IsDependentOn("Build");
+
 Task("Test")
 	.IsDependentOn("Build")
 	.Does(() => NUnit3($"tests/**/bin/**/*.UnitTests.dll", new NUnit3Settings { NoResults = true }));
 
 Task("SourceIndex")
+	.IsDependentOn("Clean")
 	.IsDependentOn("Test")
 	.WithCriteria(() => configuration == "Release" && gitRepository != null)
 	.Does(() =>
