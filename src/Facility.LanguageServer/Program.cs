@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using Facility.Definition;
 using Microsoft.Extensions.Logging;
@@ -22,6 +21,7 @@ namespace Facility.LanguageServer
 			var serviceInfos = new Dictionary<Uri, ServiceInfo>();
 			server.AddHandler(new FsdSyncHandler(server, serviceInfos));
 			server.AddHandler(new FsdDefinitionHandler(server, serviceInfos));
+			server.AddHandler(new FsdHoverHandler(server, serviceInfos));
 
 			await server.Initialize();
 			await server.WaitForExit;

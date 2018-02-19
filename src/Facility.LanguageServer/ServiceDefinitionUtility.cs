@@ -37,6 +37,22 @@ namespace Facility.LanguageServer
 			return null;
 		}
 
+		public static IServiceMemberInfo GetMemberReferencedAtPosition(this ServiceInfo service, Position requestPosition)
+		{
+			var infoAtPosition = service.Find(requestPosition);
+			if (infoAtPosition is ServiceFieldInfo field)
+			{
+				if (requestPosition >= field.TypeNamePosition)
+				{
+					var fieldType = service.GetFieldType(field);
+					var typeName = fieldType.GetMemberTypeName();
+					if (typeName != null)
+						return service.FindMember(typeName);
+				}
+			}
+			return null;
+		}
+
 		static IEnumerable<IServiceNamedInfo> GetAll(IServiceNamedInfo info)
 		{
 			return new[] { info }.Concat(GetChildren(info).SelectMany(x => GetAll(x)));

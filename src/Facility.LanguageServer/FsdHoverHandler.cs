@@ -10,9 +10,9 @@ using OmniSharp.Extensions.LanguageServer.Server;
 
 namespace Facility.LanguageServer
 {
-	sealed class FsdDefinitionHandler : FsdRequestHandler, IDefinitionHandler
+	sealed class FsdHoverHandler : FsdRequestHandler, IHoverHandler
 	{
-		public FsdDefinitionHandler(ILanguageServer router, IDictionary<Uri, ServiceInfo> serviceInfos)
+		public FsdHoverHandler(ILanguageServer router, IDictionary<Uri, ServiceInfo> serviceInfos)
 			: base(router, serviceInfos)
 		{
 		}
@@ -25,11 +25,11 @@ namespace Facility.LanguageServer
 			};
 		}
 
-		public void SetCapability(DefinitionCapability capability)
+		public void SetCapability(HoverCapability capability)
 		{
 		}
 
-		public async Task<LocationOrLocations> Handle(TextDocumentPositionParams request, CancellationToken token)
+		public async Task<Hover> Handle(TextDocumentPositionParams request, CancellationToken token)
 		{
 			Uri documentUri = request.TextDocument.Uri;
 			ServiceInfo service = GetService(documentUri);
@@ -37,13 +37,24 @@ namespace Facility.LanguageServer
 				return null;
 
 			var member = service.GetMemberReferencedAtPosition(new Position(request.Position));
-			if (member?.Position != null)
+			if (member != null)
 			{
 				var position = new Position(member.Position);
-				return new LocationOrLocations(new Location { Uri = documentUri, Range = new Range(position, position) });
+				return new Hover
+				{
+					Contents = GetMarkup(member),
+					Range = new Range(position, position)
+				};
 			}
 
-			return new LocationOrLocations();
+			return null;
+		}
+
+		private static MarkedStringsOrMarkupContent GetMarkup(IServiceMemberInfo member)
+		{
+			return new MarkedStringsOrMarkupContent(
+				new MarkedString(member.Summary)
+			);
 		}
 	}
 }
