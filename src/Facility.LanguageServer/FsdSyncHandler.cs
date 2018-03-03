@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Facility.Definition;
 using Facility.Definition.Fsd;
+using Facility.Definition.Http;
 using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
@@ -91,14 +92,10 @@ namespace Facility.LanguageServer
 			ServiceInfo service;
 			IReadOnlyList<ServiceDefinitionError> errors;
 			if (!m_parser.TryParseDefinition(new NamedText(documentUri.AbsoluteUri, text), out service, out errors))
-			{
-				diagnostics.AddRange(errors.Select(x => new Diagnostic
-				{
-					Severity = DiagnosticSeverity.Error,
-					Message = x.Message,
-					Range = new Range(new Position(x.Position), new Position(x.Position))
-				}));
-			}
+				diagnostics.AddRange(errors.Select(ToDiagnostic));
+			HttpServiceInfo httpService;
+			if (service != null && !HttpServiceInfo.TryCreate(service, out httpService, out errors))
+				diagnostics.AddRange(errors.Select(ToDiagnostic));
 			SetService(documentUri, service);
 			Router.PublishDiagnostics(new PublishDiagnosticsParams
 			{
@@ -106,6 +103,14 @@ namespace Facility.LanguageServer
 				Diagnostics = diagnostics
 			});
 		}
+
+		static Diagnostic ToDiagnostic(ServiceDefinitionError error)
+			=> new Diagnostic
+			{
+				Severity = DiagnosticSeverity.Error,
+				Message = error.Message,
+				Range = new Range(new Position(error.Position), new Position(error.Position))
+			};
 
 		readonly FsdParser m_parser;
 	}
