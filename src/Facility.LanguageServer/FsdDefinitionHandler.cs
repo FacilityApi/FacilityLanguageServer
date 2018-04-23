@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,7 +10,7 @@ using OmniSharp.Extensions.LanguageServer.Server;
 
 namespace Facility.LanguageServer
 {
-	sealed class FsdDefinitionHandler : FsdRequestHandler, IDefinitionHandler
+	internal sealed class FsdDefinitionHandler : FsdRequestHandler, IDefinitionHandler
 	{
 		public FsdDefinitionHandler(ILanguageServer router, IDictionary<Uri, ServiceInfo> serviceInfos)
 			: base(router, serviceInfos)
@@ -39,7 +39,7 @@ namespace Facility.LanguageServer
 			var member = service.GetMemberReferencedAtPosition(new Position(request.Position));
 			if (member?.Position != null)
 			{
-				var position = new Position(member.Position);
+				var position = new Position(member.GetPart(ServicePartKind.Name)?.Position ?? member.Position);
 				return new LocationOrLocations(new Location { Uri = documentUri, Range = new Range(position, position) });
 			}
 

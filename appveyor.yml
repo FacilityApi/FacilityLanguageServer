@@ -1,7 +1,10 @@
 version: '{build}'
+image:
+- Visual Studio 2017
+- Ubuntu
 environment:
-  COVERALLSAPIKEY:
-    secure: +3piz+KU6kTBtLXxADrKxJmnKQcJTHwpBICVolk5bH/8GbNgW5ZrGr6WYEp9KWSm
+  APPVEYOR_YML_DISABLE_PS_LINUX: true
 build_script:
-- ps: .\build.ps1 -target=CoveragePublish -configuration=Debug "-coverallsApiKey=$env:COVERALLSAPIKEY"
+- ps: .\build.ps1 --target=Build
+- sh: ./build.sh --target=Build
 test: off

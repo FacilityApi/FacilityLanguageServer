@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Facility.Definition;
@@ -7,14 +7,14 @@ using LangServer = OmniSharp.Extensions.LanguageServer.Server.LanguageServer;
 
 namespace Facility.LanguageServer
 {
-	class Program
+	internal sealed class Program
 	{
-		static async Task Main(string[] args)
+		private static async Task Main()
 		{
-			//while (!System.Diagnostics.Debugger.IsAttached)
-			//{
-			//	await Task.Delay(100);
-			//}
+			////while (!System.Diagnostics.Debugger.IsAttached)
+			////{
+			////	await Task.Delay(100);
+			////}
 
 			var server = new LangServer(Console.OpenStandardInput(), Console.OpenStandardOutput(), new LoggerFactory());
 

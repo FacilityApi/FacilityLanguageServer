@@ -1,7 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Facility.Definition;
 using Facility.Definition.Fsd;
@@ -14,7 +13,7 @@ using OmniSharp.Extensions.LanguageServer.Server;
 
 namespace Facility.LanguageServer
 {
-	sealed class FsdSyncHandler : FsdRequestHandler, ITextDocumentSyncHandler
+	internal sealed class FsdSyncHandler : FsdRequestHandler, ITextDocumentSyncHandler
 	{
 		public FsdSyncHandler(ILanguageServer router, IDictionary<Uri, ServiceInfo> serviceInfos)
 			: base(router, serviceInfos)
@@ -22,11 +21,12 @@ namespace Facility.LanguageServer
 			m_parser = new FsdParser();
 		}
 
-		public TextDocumentSyncOptions Options { get; } = new TextDocumentSyncOptions
-		{
-			Change = TextDocumentSyncKind.Full,
-			OpenClose = true
-		};
+		public TextDocumentSyncOptions Options { get; } =
+			new TextDocumentSyncOptions
+			{
+				Change = TextDocumentSyncKind.Full,
+				OpenClose = true
+			};
 
 		public void SetCapability(SynchronizationCapability capability)
 		{
@@ -86,17 +86,20 @@ namespace Facility.LanguageServer
 			};
 		}
 
-		async Task ParseAsync(Uri documentUri, string text)
+		private async Task ParseAsync(Uri documentUri, string text)
 		{
 			var diagnostics = new List<Diagnostic>();
+
 			ServiceInfo service;
 			IReadOnlyList<ServiceDefinitionError> errors;
-			if (!m_parser.TryParseDefinition(new NamedText(documentUri.AbsoluteUri, text), out service, out errors))
+			if (!m_parser.TryParseDefinition(new ServiceDefinitionText(documentUri.AbsoluteUri, text), out service, out errors))
 				diagnostics.AddRange(errors.Select(ToDiagnostic));
-			HttpServiceInfo httpService;
-			if (service != null && !HttpServiceInfo.TryCreate(service, out httpService, out errors))
+
+			if (service != null && !HttpServiceInfo.TryCreate(service, out _, out errors))
 				diagnostics.AddRange(errors.Select(ToDiagnostic));
+
 			SetService(documentUri, service);
+
 			Router.PublishDiagnostics(new PublishDiagnosticsParams
 			{
 				Uri = documentUri,
@@ -104,14 +107,14 @@ namespace Facility.LanguageServer
 			});
 		}
 
-		static Diagnostic ToDiagnostic(ServiceDefinitionError error)
-			=> new Diagnostic
+		private static Diagnostic ToDiagnostic(ServiceDefinitionError error) =>
+			new Diagnostic
 			{
 				Severity = DiagnosticSeverity.Error,
 				Message = error.Message,
 				Range = new Range(new Position(error.Position), new Position(error.Position))
 			};
 
-		readonly FsdParser m_parser;
+		private readonly FsdParser m_parser;
 	}
 }

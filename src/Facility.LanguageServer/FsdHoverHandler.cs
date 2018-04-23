@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,7 +10,7 @@ using OmniSharp.Extensions.LanguageServer.Server;
 
 namespace Facility.LanguageServer
 {
-	sealed class FsdHoverHandler : FsdRequestHandler, IHoverHandler
+	internal sealed class FsdHoverHandler : FsdRequestHandler, IHoverHandler
 	{
 		public FsdHoverHandler(ILanguageServer router, IDictionary<Uri, ServiceInfo> serviceInfos)
 			: base(router, serviceInfos)
@@ -50,7 +50,7 @@ namespace Facility.LanguageServer
 			return null;
 		}
 
-		private static MarkedStringsOrMarkupContent GetMarkup(IServiceMemberInfo member)
+		private static MarkedStringsOrMarkupContent GetMarkup(ServiceMemberInfo member)
 		{
 			return new MarkedStringsOrMarkupContent(
 				new MarkedString(member.Summary)

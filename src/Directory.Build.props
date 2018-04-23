@@ -2,7 +2,7 @@
 <Project>
   <PropertyGroup>
     <Copyright>Copyright 2018 Dave Dunkin</Copyright>
-    <VersionPrefix>1.1.0</VersionPrefix>
+    <VersionPrefix>1.2.0</VersionPrefix>
     <PackageLicenseUrl>https://github.com/FacilityApi/FacilityLanguageServer/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/FacilityApi/FacilityLanguageServer</PackageProjectUrl>
     <PackageReleaseNotes>https://github.com/FacilityApi/FacilityLanguageServer/releases</PackageReleaseNotes>

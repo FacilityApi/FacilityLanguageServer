@@ -1,22 +1,15 @@
-﻿using System;
+using System;
 using Facility.Definition;
 using LspPosition = OmniSharp.Extensions.LanguageServer.Protocol.Models.Position;
-using LspRange = OmniSharp.Extensions.LanguageServer.Protocol.Models.Range;
 
 namespace Facility.LanguageServer
 {
-	struct Position : IComparable<Position>, IEquatable<Position>
+	internal struct Position : IComparable<Position>, IEquatable<Position>
 	{
 		public readonly long Line;
 		public readonly long Character;
 
-		public Position(long line, long character)
-		{
-			Line = line;
-			Character = character;
-		}
-
-		public Position(NamedTextPosition position)
+		public Position(ServiceDefinitionPosition position)
 		{
 			Line = position.LineNumber - 1;
 			Character = position.ColumnNumber - 1;
@@ -40,7 +33,7 @@ namespace Facility.LanguageServer
 			return this == other;
 		}
 
-		public override int GetHashCode() => (int)(1 + 17 * Line + 13 * Character);
+		public override int GetHashCode() => (int) (1 + 17 * Line + 13 * Character);
 
 		public int CompareTo(Position other)
 		{
@@ -63,16 +56,16 @@ namespace Facility.LanguageServer
 
 		public static bool operator <=(Position a, Position b) => a < b || a == b;
 
-		public static bool operator ==(Position a, NamedTextPosition b) => b != null && a == new Position(b);
+		public static bool operator ==(Position a, ServiceDefinitionPosition b) => b != null && a == new Position(b);
 
-		public static bool operator !=(Position a, NamedTextPosition b) => b == null || a != new Position(b);
+		public static bool operator !=(Position a, ServiceDefinitionPosition b) => b == null || a != new Position(b);
 
-		public static bool operator >(Position a, NamedTextPosition b) => b == null || a > new Position(b);
+		public static bool operator >(Position a, ServiceDefinitionPosition b) => b == null || a > new Position(b);
 
-		public static bool operator >=(Position a, NamedTextPosition b) => b == null || a >= new Position(b);
+		public static bool operator >=(Position a, ServiceDefinitionPosition b) => b == null || a >= new Position(b);
 
-		public static bool operator <(Position a, NamedTextPosition b) => b != null && a < new Position(b);
+		public static bool operator <(Position a, ServiceDefinitionPosition b) => b != null && a < new Position(b);
 
-		public static bool operator <=(Position a, NamedTextPosition b) => b != null && a <= new Position(b);
+		public static bool operator <=(Position a, ServiceDefinitionPosition b) => b != null && a <= new Position(b);
 	}
 }

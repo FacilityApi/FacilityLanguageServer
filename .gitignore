@@ -2,9 +2,7 @@
 .vscode/
 bin/
 cake/
-node_modules/
 obj/
-packages/
 release/
 
 *.cache
@@ -13,3 +11,5 @@ release/
 *.ncrunchsolution
 *.user
 *.userprefs
+launchSettings.json
+nCrunchTemp*
