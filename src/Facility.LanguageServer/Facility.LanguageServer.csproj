@@ -8,6 +8,6 @@
   <ItemGroup>
     <PackageReference Include="Facility.Definition" Version="$(FacilityVersion)" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
-    <PackageReference Include="OmniSharp.Extensions.LanguageServer" Version="0.7.7" />
+    <PackageReference Include="OmniSharp.Extensions.LanguageServer" Version="0.19.7" />
   </ItemGroup>
 </Project>
