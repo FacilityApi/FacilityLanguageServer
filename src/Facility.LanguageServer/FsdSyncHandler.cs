@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Facility.Definition;
 using Facility.Definition.Fsd;
 using Facility.Definition.Http;
@@ -10,6 +6,7 @@ using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using OmniSharp.Extensions.LanguageServer.Protocol.Server.Capabilities;
 using OmniSharp.Extensions.LanguageServer.Server;
+using Range = OmniSharp.Extensions.LanguageServer.Protocol.Models.Range;
 
 namespace Facility.LanguageServer
 {
@@ -25,7 +22,7 @@ namespace Facility.LanguageServer
 			new TextDocumentSyncOptions
 			{
 				Change = TextDocumentSyncKind.Full,
-				OpenClose = true
+				OpenClose = true,
 			};
 
 		public void SetCapability(SynchronizationCapability capability)
@@ -65,7 +62,7 @@ namespace Facility.LanguageServer
 		{
 			return new TextDocumentRegistrationOptions
 			{
-				DocumentSelector = DocumentSelector
+				DocumentSelector = DocumentSelector,
 			};
 		}
 
@@ -74,7 +71,7 @@ namespace Facility.LanguageServer
 			return new TextDocumentChangeRegistrationOptions
 			{
 				DocumentSelector = DocumentSelector,
-				SyncKind = Options.Change
+				SyncKind = Options.Change,
 			};
 		}
 
@@ -82,7 +79,7 @@ namespace Facility.LanguageServer
 		{
 			return new TextDocumentSaveRegistrationOptions
 			{
-				DocumentSelector = DocumentSelector
+				DocumentSelector = DocumentSelector,
 			};
 		}
 
@@ -103,7 +100,7 @@ namespace Facility.LanguageServer
 			Router.PublishDiagnostics(new PublishDiagnosticsParams
 			{
 				Uri = documentUri,
-				Diagnostics = diagnostics
+				Diagnostics = diagnostics,
 			});
 		}
 
@@ -112,7 +109,7 @@ namespace Facility.LanguageServer
 			{
 				Severity = DiagnosticSeverity.Error,
 				Message = error.Message,
-				Range = new Range(new Position(error.Position), new Position(error.Position))
+				Range = new Range(new Position(error.Position), new Position(error.Position)),
 			};
 
 		private readonly FsdParser m_parser;

@@ -1,4 +1,3 @@
-using System.Linq;
 using Facility.Definition;
 
 namespace Facility.LanguageServer
@@ -22,14 +21,14 @@ namespace Facility.LanguageServer
 		{
 			switch (type.Kind)
 			{
-			case ServiceTypeKind.Dto:
-				return type.Dto.Name;
-			case ServiceTypeKind.Enum:
-				return type.Enum.Name;
-			case ServiceTypeKind.Array:
-			case ServiceTypeKind.Result:
-			case ServiceTypeKind.Map:
-				return type.ValueType.GetMemberTypeName();
+				case ServiceTypeKind.Dto:
+					return type.Dto.Name;
+				case ServiceTypeKind.Enum:
+					return type.Enum.Name;
+				case ServiceTypeKind.Array:
+				case ServiceTypeKind.Result:
+				case ServiceTypeKind.Map:
+					return type.ValueType.GetMemberTypeName();
 			}
 			return null;
 		}
