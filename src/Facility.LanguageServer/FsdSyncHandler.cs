@@ -58,7 +58,6 @@ namespace Facility.LanguageServer
 			return Unit.Value;
 		}
 
-		// public Task Handle(DidSaveTextDocumentParams notification)
 		public async Task<Unit> Handle(DidSaveTextDocumentParams request, CancellationToken cancellationToken)
 		{
 			return Unit.Value;
