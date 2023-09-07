@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Facility.Definition;
 using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using OmniSharp.Extensions.LanguageServer.Server;
+using Range = OmniSharp.Extensions.LanguageServer.Protocol.Models.Range;
 
 namespace Facility.LanguageServer
 {
@@ -21,7 +18,7 @@ namespace Facility.LanguageServer
 		{
 			return new TextDocumentRegistrationOptions
 			{
-				DocumentSelector = DocumentSelector
+				DocumentSelector = DocumentSelector,
 			};
 		}
 
@@ -43,7 +40,7 @@ namespace Facility.LanguageServer
 				return new Hover
 				{
 					Contents = GetMarkup(member),
-					Range = new Range(position, position)
+					Range = new Range(position, position),
 				};
 			}
 
@@ -53,8 +50,7 @@ namespace Facility.LanguageServer
 		private static MarkedStringsOrMarkupContent GetMarkup(ServiceMemberInfo member)
 		{
 			return new MarkedStringsOrMarkupContent(
-				new MarkedString(member.Summary)
-			);
+				new MarkedString(member.Summary));
 		}
 	}
 }

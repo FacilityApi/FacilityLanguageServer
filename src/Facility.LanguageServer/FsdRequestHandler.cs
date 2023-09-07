@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Facility.Definition;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using OmniSharp.Extensions.LanguageServer.Server;
@@ -21,9 +19,8 @@ namespace Facility.LanguageServer
 				new DocumentFilter
 				{
 					Pattern = "**/*.fsd",
-					Language = "fsd"
-				}
-			);
+					Language = "fsd",
+				});
 
 		protected void SetService(Uri documentUri, ServiceInfo service)
 		{
@@ -35,6 +32,6 @@ namespace Facility.LanguageServer
 			return m_services.TryGetValue(documentUri, out ServiceInfo service) ? service : null;
 		}
 
-		readonly IDictionary<Uri, ServiceInfo> m_services;
+		private readonly IDictionary<Uri, ServiceInfo> m_services;
 	}
 }

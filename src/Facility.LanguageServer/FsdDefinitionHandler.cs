@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Facility.Definition;
 using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using OmniSharp.Extensions.LanguageServer.Server;
+using Range = OmniSharp.Extensions.LanguageServer.Protocol.Models.Range;
 
 namespace Facility.LanguageServer
 {
@@ -21,7 +18,7 @@ namespace Facility.LanguageServer
 		{
 			return new TextDocumentRegistrationOptions
 			{
-				DocumentSelector = DocumentSelector
+				DocumentSelector = DocumentSelector,
 			};
 		}
 

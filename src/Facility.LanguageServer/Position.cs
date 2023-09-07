@@ -1,10 +1,9 @@
-using System;
 using Facility.Definition;
 using LspPosition = OmniSharp.Extensions.LanguageServer.Protocol.Models.Position;
 
 namespace Facility.LanguageServer
 {
-	internal struct Position : IComparable<Position>, IEquatable<Position>
+	internal readonly struct Position : IComparable<Position>, IEquatable<Position>
 	{
 		public readonly long Line;
 		public readonly long Character;
