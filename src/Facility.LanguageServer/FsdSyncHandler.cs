@@ -101,9 +101,7 @@ namespace Facility.LanguageServer
 		{
 			var diagnostics = new List<Diagnostic>();
 
-			ServiceInfo service;
-			IReadOnlyList<ServiceDefinitionError> errors;
-			if (!m_parser.TryParseDefinition(new ServiceDefinitionText(documentUri.AbsoluteUri, text), out service, out errors))
+			if (!m_parser.TryParseDefinition(new ServiceDefinitionText(documentUri.AbsoluteUri, text), out var service, out var errors))
 				diagnostics.AddRange(errors.Select(ToDiagnostic));
 
 			if (service != null && !HttpServiceInfo.TryCreate(service, out _, out errors))

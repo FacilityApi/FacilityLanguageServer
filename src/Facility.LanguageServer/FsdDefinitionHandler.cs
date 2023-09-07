@@ -29,8 +29,8 @@ namespace Facility.LanguageServer
 
 		public async Task<LocationOrLocationLinks> Handle(DefinitionParams request, CancellationToken cancellationToken)
 		{
-			DocumentUri documentUri = request.TextDocument.Uri;
-			ServiceInfo service = GetService(documentUri);
+			var documentUri = request.TextDocument.Uri;
+			var service = GetService(documentUri);
 			if (service == null)
 				return null;
 

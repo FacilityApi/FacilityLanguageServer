@@ -30,7 +30,7 @@ namespace Facility.LanguageServer
 
 		protected ServiceInfo GetService(DocumentUri documentUri)
 		{
-			return m_services.TryGetValue(documentUri.ToUri(), out ServiceInfo service) ? service : null;
+			return m_services.TryGetValue(documentUri.ToUri(), out var service) ? service : null;
 		}
 
 		private readonly IDictionary<Uri, ServiceInfo> m_services;
