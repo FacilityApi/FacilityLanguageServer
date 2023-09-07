@@ -7,7 +7,7 @@ namespace Facility.LanguageServer
 {
 	internal abstract class FsdRequestHandler
 	{
-		protected FsdRequestHandler(ILanguageServer router, IDictionary<Uri, ServiceInfo> serviceInfos)
+		protected FsdRequestHandler(ILanguageServer router, IDictionary<DocumentUri, ServiceInfo> serviceInfos)
 		{
 			Router = router;
 			m_services = serviceInfos;
@@ -23,16 +23,16 @@ namespace Facility.LanguageServer
 					Language = "fsd",
 				});
 
-		protected void SetService(Uri documentUri, ServiceInfo service)
+		protected void SetService(DocumentUri documentUri, ServiceInfo service)
 		{
 			m_services[documentUri] = service;
 		}
 
 		protected ServiceInfo GetService(DocumentUri documentUri)
 		{
-			return m_services.TryGetValue(documentUri.ToUri(), out var service) ? service : null;
+			return m_services.TryGetValue(documentUri, out var service) ? service : null;
 		}
 
-		private readonly IDictionary<Uri, ServiceInfo> m_services;
+		private readonly IDictionary<DocumentUri, ServiceInfo> m_services;
 	}
 }

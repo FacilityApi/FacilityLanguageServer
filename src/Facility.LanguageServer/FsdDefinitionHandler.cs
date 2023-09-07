@@ -10,7 +10,7 @@ namespace Facility.LanguageServer
 {
 	internal sealed class FsdDefinitionHandler : FsdRequestHandler, IDefinitionHandler
 	{
-		public FsdDefinitionHandler(ILanguageServer router, IDictionary<Uri, ServiceInfo> serviceInfos)
+		public FsdDefinitionHandler(ILanguageServer router, IDictionary<DocumentUri, ServiceInfo> serviceInfos)
 			: base(router, serviceInfos)
 		{
 		}

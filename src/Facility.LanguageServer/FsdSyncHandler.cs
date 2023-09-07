@@ -14,7 +14,7 @@ namespace Facility.LanguageServer
 {
 	internal sealed class FsdSyncHandler : FsdRequestHandler, ITextDocumentSyncHandler
 	{
-		public FsdSyncHandler(ILanguageServer router, IDictionary<Uri, ServiceInfo> serviceInfos)
+		public FsdSyncHandler(ILanguageServer router, IDictionary<DocumentUri, ServiceInfo> serviceInfos)
 			: base(router, serviceInfos)
 		{
 			m_parser = new FsdParser();
@@ -38,7 +38,7 @@ namespace Facility.LanguageServer
 
 		public async Task<Unit> Handle(DidOpenTextDocumentParams request, CancellationToken cancellationToken)
 		{
-			await ParseAsync(request.TextDocument.Uri.ToUri(), request.TextDocument.Text).ConfigureAwait(false);
+			await ParseAsync(request.TextDocument.Uri, request.TextDocument.Text).ConfigureAwait(false);
 			return Unit.Value;
 		}
 
@@ -46,14 +46,14 @@ namespace Facility.LanguageServer
 		{
 			foreach (var change in request.ContentChanges)
 			{
-				await ParseAsync(request.TextDocument.Uri.ToUri(), change.Text).ConfigureAwait(false);
+				await ParseAsync(request.TextDocument.Uri, change.Text).ConfigureAwait(false);
 			}
 			return Unit.Value;
 		}
 
 		public async Task<Unit> Handle(DidCloseTextDocumentParams request, CancellationToken cancellationToken)
 		{
-			SetService(request.TextDocument.Uri.ToUri(), null);
+			SetService(request.TextDocument.Uri, null);
 
 			return Unit.Value;
 		}
@@ -97,11 +97,11 @@ namespace Facility.LanguageServer
 			};
 		}
 
-		private async Task ParseAsync(Uri documentUri, string text)
+		private async Task ParseAsync(DocumentUri documentUri, string text)
 		{
 			var diagnostics = new List<Diagnostic>();
 
-			if (!m_parser.TryParseDefinition(new ServiceDefinitionText(documentUri.AbsoluteUri, text), out var service, out var errors))
+			if (!m_parser.TryParseDefinition(new ServiceDefinitionText(documentUri.ToUri().AbsoluteUri, text), out var service, out var errors))
 				diagnostics.AddRange(errors.Select(ToDiagnostic));
 
 			if (service != null && !HttpServiceInfo.TryCreate(service, out _, out errors))
@@ -111,7 +111,7 @@ namespace Facility.LanguageServer
 
 			Router.PublishDiagnostics(new PublishDiagnosticsParams
 			{
-				Uri = documentUri,
+				Uri = documentUri.ToUri(),
 				Diagnostics = diagnostics,
 			});
 		}
