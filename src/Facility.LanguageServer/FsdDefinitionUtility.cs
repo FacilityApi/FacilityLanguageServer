@@ -22,9 +22,9 @@ namespace Facility.LanguageServer
 			switch (type.Kind)
 			{
 				case ServiceTypeKind.Dto:
-					return type.Dto.Name;
+					return type.Dto!.Name;
 				case ServiceTypeKind.Enum:
-					return type.Enum.Name;
+					return type.Enum!.Name;
 				case ServiceTypeKind.Array:
 				case ServiceTypeKind.Result:
 				case ServiceTypeKind.Map:
