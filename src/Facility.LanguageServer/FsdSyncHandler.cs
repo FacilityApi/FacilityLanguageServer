@@ -1,11 +1,13 @@
 using Facility.Definition;
 using Facility.Definition.Fsd;
 using Facility.Definition.Http;
+using MediatR;
 using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
+using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
+using OmniSharp.Extensions.LanguageServer.Protocol.Server;
 using OmniSharp.Extensions.LanguageServer.Protocol.Server.Capabilities;
-using OmniSharp.Extensions.LanguageServer.Server;
 using Range = OmniSharp.Extensions.LanguageServer.Protocol.Models.Range;
 
 namespace Facility.LanguageServer
@@ -29,44 +31,56 @@ namespace Facility.LanguageServer
 		{
 		}
 
-		public TextDocumentAttributes GetTextDocumentAttributes(Uri uri)
+		public TextDocumentAttributes GetTextDocumentAttributes(DocumentUri uri)
 		{
 			return new TextDocumentAttributes(uri, "fsd");
 		}
 
-		public async Task Handle(DidOpenTextDocumentParams notification)
+		public async Task<Unit> Handle(DidOpenTextDocumentParams request, CancellationToken cancellationToken)
 		{
-			await ParseAsync(notification.TextDocument.Uri, notification.TextDocument.Text).ConfigureAwait(false);
+			await ParseAsync(request.TextDocument.Uri.ToUri(), request.TextDocument.Text).ConfigureAwait(false);
+			return Unit.Value;
 		}
 
-		public async Task Handle(DidChangeTextDocumentParams notification)
+		public async Task<Unit> Handle(DidChangeTextDocumentParams request, CancellationToken cancellationToken)
 		{
-			foreach (var change in notification.ContentChanges)
+			foreach (var change in request.ContentChanges)
 			{
-				await ParseAsync(notification.TextDocument.Uri, change.Text).ConfigureAwait(false);
+				await ParseAsync(request.TextDocument.Uri.ToUri(), change.Text).ConfigureAwait(false);
 			}
+			return Unit.Value;
 		}
 
-		public Task Handle(DidCloseTextDocumentParams notification)
+		public async Task<Unit> Handle(DidCloseTextDocumentParams request, CancellationToken cancellationToken)
 		{
-			SetService(notification.TextDocument.Uri, null);
-			return Task.CompletedTask;
+			SetService(request.TextDocument.Uri.ToUri(), null);
+
+			return Unit.Value;
 		}
 
-		public Task Handle(DidSaveTextDocumentParams notification)
+		// public Task Handle(DidSaveTextDocumentParams notification)
+		public async Task<Unit> Handle(DidSaveTextDocumentParams request, CancellationToken cancellationToken)
 		{
-			return Task.CompletedTask;
+			return Unit.Value;
 		}
 
-		TextDocumentRegistrationOptions IRegistration<TextDocumentRegistrationOptions>.GetRegistrationOptions()
+		public TextDocumentOpenRegistrationOptions GetRegistrationOptions(SynchronizationCapability capability, ClientCapabilities clientCapabilities)
 		{
-			return new TextDocumentRegistrationOptions
+			return new TextDocumentOpenRegistrationOptions
 			{
 				DocumentSelector = DocumentSelector,
 			};
 		}
 
-		TextDocumentChangeRegistrationOptions IRegistration<TextDocumentChangeRegistrationOptions>.GetRegistrationOptions()
+		TextDocumentCloseRegistrationOptions IRegistration<TextDocumentCloseRegistrationOptions, SynchronizationCapability>.GetRegistrationOptions(SynchronizationCapability capability, ClientCapabilities clientCapabilities)
+		{
+			return new TextDocumentCloseRegistrationOptions()
+			{
+				DocumentSelector = DocumentSelector,
+			};
+		}
+
+		TextDocumentChangeRegistrationOptions IRegistration<TextDocumentChangeRegistrationOptions, SynchronizationCapability>.GetRegistrationOptions(SynchronizationCapability capability, ClientCapabilities clientCapabilities)
 		{
 			return new TextDocumentChangeRegistrationOptions
 			{
@@ -75,7 +89,7 @@ namespace Facility.LanguageServer
 			};
 		}
 
-		TextDocumentSaveRegistrationOptions IRegistration<TextDocumentSaveRegistrationOptions>.GetRegistrationOptions()
+		TextDocumentSaveRegistrationOptions IRegistration<TextDocumentSaveRegistrationOptions, SynchronizationCapability>.GetRegistrationOptions(SynchronizationCapability capability, ClientCapabilities clientCapabilities)
 		{
 			return new TextDocumentSaveRegistrationOptions
 			{

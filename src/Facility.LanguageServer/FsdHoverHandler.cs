@@ -1,8 +1,9 @@
 using Facility.Definition;
 using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
+using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
-using OmniSharp.Extensions.LanguageServer.Server;
+using OmniSharp.Extensions.LanguageServer.Protocol.Server;
 using Range = OmniSharp.Extensions.LanguageServer.Protocol.Models.Range;
 
 namespace Facility.LanguageServer
@@ -14,9 +15,9 @@ namespace Facility.LanguageServer
 		{
 		}
 
-		public TextDocumentRegistrationOptions GetRegistrationOptions()
+		public HoverRegistrationOptions GetRegistrationOptions(HoverCapability capability, ClientCapabilities clientCapabilities)
 		{
-			return new TextDocumentRegistrationOptions
+			return new HoverRegistrationOptions()
 			{
 				DocumentSelector = DocumentSelector,
 			};
@@ -26,9 +27,9 @@ namespace Facility.LanguageServer
 		{
 		}
 
-		public async Task<Hover> Handle(TextDocumentPositionParams request, CancellationToken token)
+		public async Task<Hover> Handle(HoverParams request, CancellationToken cancellationToken)
 		{
-			Uri documentUri = request.TextDocument.Uri;
+			DocumentUri documentUri = request.TextDocument.Uri;
 			ServiceInfo service = GetService(documentUri);
 			if (service == null)
 				return null;

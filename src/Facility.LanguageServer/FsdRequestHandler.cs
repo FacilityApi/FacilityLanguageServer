@@ -1,6 +1,7 @@
 using Facility.Definition;
+using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
-using OmniSharp.Extensions.LanguageServer.Server;
+using OmniSharp.Extensions.LanguageServer.Protocol.Server;
 
 namespace Facility.LanguageServer
 {
@@ -27,9 +28,9 @@ namespace Facility.LanguageServer
 			m_services[documentUri] = service;
 		}
 
-		protected ServiceInfo GetService(Uri documentUri)
+		protected ServiceInfo GetService(DocumentUri documentUri)
 		{
-			return m_services.TryGetValue(documentUri, out ServiceInfo service) ? service : null;
+			return m_services.TryGetValue(documentUri.ToUri(), out ServiceInfo service) ? service : null;
 		}
 
 		private readonly IDictionary<Uri, ServiceInfo> m_services;
