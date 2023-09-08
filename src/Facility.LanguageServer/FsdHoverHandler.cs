@@ -4,7 +4,6 @@ using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
 using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using OmniSharp.Extensions.LanguageServer.Protocol.Server;
-using Range = OmniSharp.Extensions.LanguageServer.Protocol.Models.Range;
 
 namespace Facility.LanguageServer
 {
@@ -40,11 +39,9 @@ namespace Facility.LanguageServer
 			var member = service.GetMemberReferencedAtPosition(new Position(request.Position));
 			if (member != null)
 			{
-				var position = new Position(member.Position);
 				return new Hover
 				{
 					Contents = GetMarkup(member),
-					Range = new Range(position, position),
 				};
 			}
 
@@ -54,7 +51,7 @@ namespace Facility.LanguageServer
 		private static MarkedStringsOrMarkupContent GetMarkup(ServiceMemberInfo member)
 		{
 			return new MarkedStringsOrMarkupContent(
-				new MarkedString(member.Summary));
+				new MarkupContent { Kind = MarkupKind.PlainText, Value = member.Summary });
 		}
 	}
 }
