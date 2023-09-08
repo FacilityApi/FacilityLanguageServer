@@ -1,22 +1,25 @@
 using Facility.Definition;
 using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
+using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
-using OmniSharp.Extensions.LanguageServer.Server;
-using Range = OmniSharp.Extensions.LanguageServer.Protocol.Models.Range;
+using OmniSharp.Extensions.LanguageServer.Protocol.Server;
 
 namespace Facility.LanguageServer
 {
 	internal sealed class FsdHoverHandler : FsdRequestHandler, IHoverHandler
 	{
-		public FsdHoverHandler(ILanguageServer router, IDictionary<Uri, ServiceInfo> serviceInfos)
-			: base(router, serviceInfos)
+		public FsdHoverHandler(
+			ILanguageServerFacade router,
+			ILanguageServerConfiguration configuration,
+			IDictionary<DocumentUri, ServiceInfo> serviceInfos)
+			: base(router, configuration, serviceInfos)
 		{
 		}
 
-		public TextDocumentRegistrationOptions GetRegistrationOptions()
+		public HoverRegistrationOptions GetRegistrationOptions(HoverCapability capability, ClientCapabilities clientCapabilities)
 		{
-			return new TextDocumentRegistrationOptions
+			return new HoverRegistrationOptions()
 			{
 				DocumentSelector = DocumentSelector,
 			};
@@ -26,21 +29,19 @@ namespace Facility.LanguageServer
 		{
 		}
 
-		public async Task<Hover> Handle(TextDocumentPositionParams request, CancellationToken token)
+		public async Task<Hover> Handle(HoverParams request, CancellationToken cancellationToken)
 		{
-			Uri documentUri = request.TextDocument.Uri;
-			ServiceInfo service = GetService(documentUri);
+			var documentUri = request.TextDocument.Uri;
+			var service = GetService(documentUri);
 			if (service == null)
 				return null;
 
 			var member = service.GetMemberReferencedAtPosition(new Position(request.Position));
 			if (member != null)
 			{
-				var position = new Position(member.Position);
 				return new Hover
 				{
 					Contents = GetMarkup(member),
-					Range = new Range(position, position),
 				};
 			}
 
@@ -50,7 +51,7 @@ namespace Facility.LanguageServer
 		private static MarkedStringsOrMarkupContent GetMarkup(ServiceMemberInfo member)
 		{
 			return new MarkedStringsOrMarkupContent(
-				new MarkedString(member.Summary));
+				new MarkupContent { Kind = MarkupKind.PlainText, Value = member.Summary });
 		}
 	}
 }

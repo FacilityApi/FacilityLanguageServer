@@ -1,18 +1,34 @@
 using Facility.Definition;
 using Facility.LanguageServer;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using LangServer = OmniSharp.Extensions.LanguageServer.Server.LanguageServer;
+using OmniSharp.Extensions.LanguageServer.Protocol;
+using OmniSharp.Extensions.LanguageServer.Server;
+
 ////while (!System.Diagnostics.Debugger.IsAttached)
 ////{
 ////	await Task.Delay(100);
 ////}
 
-var server = new LangServer(Console.OpenStandardInput(), Console.OpenStandardOutput(), new LoggerFactory());
+var serviceInfos = new Dictionary<DocumentUri, ServiceInfo>();
 
-var serviceInfos = new Dictionary<Uri, ServiceInfo>();
-server.AddHandler(new FsdSyncHandler(server, serviceInfos));
-server.AddHandler(new FsdDefinitionHandler(server, serviceInfos));
-server.AddHandler(new FsdHoverHandler(server, serviceInfos));
+var server = await LanguageServer.From(
+	options =>
+		options
+			.WithInput(Console.OpenStandardInput())
+			.WithOutput(Console.OpenStandardOutput())
+			.ConfigureLogging(
+				x => x
+					.AddLanguageProtocolLogging()
+					.SetMinimumLevel(LogLevel.Debug))
+			.WithServices(
+				services => services
+					.AddSingleton<IDictionary<DocumentUri, ServiceInfo>>(serviceInfos))
+			.WithHandler<FsdSyncHandler>()
+			.WithHandler<FsdDefinitionHandler>()
+			.WithHandler<FsdHoverHandler>()
+			.WithServices(
+				x => x
+					.AddLogging(b => b.SetMinimumLevel(LogLevel.Trace)))).ConfigureAwait(false);
 
-await server.Initialize().ConfigureAwait(false);
 await server.WaitForExit.ConfigureAwait(false);

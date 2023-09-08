@@ -1,22 +1,26 @@
 using Facility.Definition;
 using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
+using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
-using OmniSharp.Extensions.LanguageServer.Server;
+using OmniSharp.Extensions.LanguageServer.Protocol.Server;
 using Range = OmniSharp.Extensions.LanguageServer.Protocol.Models.Range;
 
 namespace Facility.LanguageServer
 {
 	internal sealed class FsdDefinitionHandler : FsdRequestHandler, IDefinitionHandler
 	{
-		public FsdDefinitionHandler(ILanguageServer router, IDictionary<Uri, ServiceInfo> serviceInfos)
-			: base(router, serviceInfos)
+		public FsdDefinitionHandler(
+			ILanguageServerFacade router,
+			ILanguageServerConfiguration configuration,
+			IDictionary<DocumentUri, ServiceInfo> serviceInfos)
+			: base(router, configuration, serviceInfos)
 		{
 		}
 
-		public TextDocumentRegistrationOptions GetRegistrationOptions()
+		public DefinitionRegistrationOptions GetRegistrationOptions(DefinitionCapability capability, ClientCapabilities clientCapabilities)
 		{
-			return new TextDocumentRegistrationOptions
+			return new DefinitionRegistrationOptions()
 			{
 				DocumentSelector = DocumentSelector,
 			};
@@ -26,10 +30,10 @@ namespace Facility.LanguageServer
 		{
 		}
 
-		public async Task<LocationOrLocations> Handle(TextDocumentPositionParams request, CancellationToken token)
+		public async Task<LocationOrLocationLinks> Handle(DefinitionParams request, CancellationToken cancellationToken)
 		{
-			Uri documentUri = request.TextDocument.Uri;
-			ServiceInfo service = GetService(documentUri);
+			var documentUri = request.TextDocument.Uri;
+			var service = GetService(documentUri);
 			if (service == null)
 				return null;
 
@@ -37,10 +41,10 @@ namespace Facility.LanguageServer
 			if (member?.Position != null)
 			{
 				var position = new Position(member.GetPart(ServicePartKind.Name)?.Position ?? member.Position);
-				return new LocationOrLocations(new Location { Uri = documentUri, Range = new Range(position, position) });
+				return new LocationOrLocationLinks(new Location { Uri = documentUri, Range = new Range(position, position) });
 			}
 
-			return new LocationOrLocations();
+			return new LocationOrLocationLinks();
 		}
 	}
 }

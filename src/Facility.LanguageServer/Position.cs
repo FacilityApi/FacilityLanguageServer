@@ -5,8 +5,8 @@ namespace Facility.LanguageServer
 {
 	internal readonly struct Position : IComparable<Position>, IEquatable<Position>
 	{
-		public readonly long Line;
-		public readonly long Character;
+		public readonly int Line;
+		public readonly int Character;
 
 		public Position(ServiceDefinitionPosition position)
 		{
@@ -32,7 +32,7 @@ namespace Facility.LanguageServer
 			return this == other;
 		}
 
-		public override int GetHashCode() => (int) (1 + 17 * Line + 13 * Character);
+		public override int GetHashCode() => 1 + 17 * Line + 13 * Character;
 
 		public int CompareTo(Position other)
 		{

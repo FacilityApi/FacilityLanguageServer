@@ -1,18 +1,24 @@
 using Facility.Definition;
+using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
-using OmniSharp.Extensions.LanguageServer.Server;
+using OmniSharp.Extensions.LanguageServer.Protocol.Server;
 
 namespace Facility.LanguageServer
 {
 	internal abstract class FsdRequestHandler
 	{
-		protected FsdRequestHandler(ILanguageServer router, IDictionary<Uri, ServiceInfo> serviceInfos)
+		protected FsdRequestHandler(
+			ILanguageServerFacade router,
+			ILanguageServerConfiguration configuration,
+			IDictionary<DocumentUri, ServiceInfo> serviceInfos)
 		{
 			Router = router;
+			Configuration = configuration;
 			m_services = serviceInfos;
 		}
 
-		protected ILanguageServer Router { get; }
+		protected ILanguageServerFacade Router { get; }
+		protected ILanguageServerConfiguration Configuration { get; }
 
 		protected DocumentSelector DocumentSelector { get; } =
 			new DocumentSelector(
@@ -22,16 +28,16 @@ namespace Facility.LanguageServer
 					Language = "fsd",
 				});
 
-		protected void SetService(Uri documentUri, ServiceInfo service)
+		protected void SetService(DocumentUri documentUri, ServiceInfo service)
 		{
 			m_services[documentUri] = service;
 		}
 
-		protected ServiceInfo GetService(Uri documentUri)
+		protected ServiceInfo GetService(DocumentUri documentUri)
 		{
-			return m_services.TryGetValue(documentUri, out ServiceInfo service) ? service : null;
+			return m_services.TryGetValue(documentUri, out var service) ? service : null;
 		}
 
-		private readonly IDictionary<Uri, ServiceInfo> m_services;
+		private readonly IDictionary<DocumentUri, ServiceInfo> m_services;
 	}
 }

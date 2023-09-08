@@ -1,19 +1,24 @@
 using Facility.Definition;
 using Facility.Definition.Fsd;
 using Facility.Definition.Http;
+using MediatR;
 using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
+using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
+using OmniSharp.Extensions.LanguageServer.Protocol.Server;
 using OmniSharp.Extensions.LanguageServer.Protocol.Server.Capabilities;
-using OmniSharp.Extensions.LanguageServer.Server;
 using Range = OmniSharp.Extensions.LanguageServer.Protocol.Models.Range;
 
 namespace Facility.LanguageServer
 {
 	internal sealed class FsdSyncHandler : FsdRequestHandler, ITextDocumentSyncHandler
 	{
-		public FsdSyncHandler(ILanguageServer router, IDictionary<Uri, ServiceInfo> serviceInfos)
-			: base(router, serviceInfos)
+		public FsdSyncHandler(
+			ILanguageServerFacade router,
+			ILanguageServerConfiguration configuration,
+			IDictionary<DocumentUri, ServiceInfo> serviceInfos)
+			: base(router, configuration, serviceInfos)
 		{
 			m_parser = new FsdParser();
 		}
@@ -29,44 +34,56 @@ namespace Facility.LanguageServer
 		{
 		}
 
-		public TextDocumentAttributes GetTextDocumentAttributes(Uri uri)
+		public TextDocumentAttributes GetTextDocumentAttributes(DocumentUri uri)
 		{
 			return new TextDocumentAttributes(uri, "fsd");
 		}
 
-		public async Task Handle(DidOpenTextDocumentParams notification)
+		public async Task<Unit> Handle(DidOpenTextDocumentParams notification, CancellationToken cancellationToken)
 		{
 			await ParseAsync(notification.TextDocument.Uri, notification.TextDocument.Text).ConfigureAwait(false);
+			await Configuration.GetScopedConfiguration(notification.TextDocument.Uri, cancellationToken).ConfigureAwait(false);
+			return Unit.Value;
 		}
 
-		public async Task Handle(DidChangeTextDocumentParams notification)
+		public async Task<Unit> Handle(DidChangeTextDocumentParams notification, CancellationToken cancellationToken)
 		{
 			foreach (var change in notification.ContentChanges)
 			{
 				await ParseAsync(notification.TextDocument.Uri, change.Text).ConfigureAwait(false);
 			}
+			return Unit.Value;
 		}
 
-		public Task Handle(DidCloseTextDocumentParams notification)
+		public async Task<Unit> Handle(DidCloseTextDocumentParams notification, CancellationToken cancellationToken)
 		{
 			SetService(notification.TextDocument.Uri, null);
-			return Task.CompletedTask;
+
+			return Unit.Value;
 		}
 
-		public Task Handle(DidSaveTextDocumentParams notification)
+		public async Task<Unit> Handle(DidSaveTextDocumentParams notification, CancellationToken cancellationToken)
 		{
-			return Task.CompletedTask;
+			return Unit.Value;
 		}
 
-		TextDocumentRegistrationOptions IRegistration<TextDocumentRegistrationOptions>.GetRegistrationOptions()
+		public TextDocumentOpenRegistrationOptions GetRegistrationOptions(SynchronizationCapability capability, ClientCapabilities clientCapabilities)
 		{
-			return new TextDocumentRegistrationOptions
+			return new TextDocumentOpenRegistrationOptions
 			{
 				DocumentSelector = DocumentSelector,
 			};
 		}
 
-		TextDocumentChangeRegistrationOptions IRegistration<TextDocumentChangeRegistrationOptions>.GetRegistrationOptions()
+		TextDocumentCloseRegistrationOptions IRegistration<TextDocumentCloseRegistrationOptions, SynchronizationCapability>.GetRegistrationOptions(SynchronizationCapability capability, ClientCapabilities clientCapabilities)
+		{
+			return new TextDocumentCloseRegistrationOptions()
+			{
+				DocumentSelector = DocumentSelector,
+			};
+		}
+
+		TextDocumentChangeRegistrationOptions IRegistration<TextDocumentChangeRegistrationOptions, SynchronizationCapability>.GetRegistrationOptions(SynchronizationCapability capability, ClientCapabilities clientCapabilities)
 		{
 			return new TextDocumentChangeRegistrationOptions
 			{
@@ -75,7 +92,7 @@ namespace Facility.LanguageServer
 			};
 		}
 
-		TextDocumentSaveRegistrationOptions IRegistration<TextDocumentSaveRegistrationOptions>.GetRegistrationOptions()
+		TextDocumentSaveRegistrationOptions IRegistration<TextDocumentSaveRegistrationOptions, SynchronizationCapability>.GetRegistrationOptions(SynchronizationCapability capability, ClientCapabilities clientCapabilities)
 		{
 			return new TextDocumentSaveRegistrationOptions
 			{
@@ -83,13 +100,11 @@ namespace Facility.LanguageServer
 			};
 		}
 
-		private async Task ParseAsync(Uri documentUri, string text)
+		private async Task ParseAsync(DocumentUri documentUri, string text)
 		{
 			var diagnostics = new List<Diagnostic>();
 
-			ServiceInfo service;
-			IReadOnlyList<ServiceDefinitionError> errors;
-			if (!m_parser.TryParseDefinition(new ServiceDefinitionText(documentUri.AbsoluteUri, text), out service, out errors))
+			if (!m_parser.TryParseDefinition(new ServiceDefinitionText(documentUri.ToUri().AbsoluteUri, text), out var service, out var errors))
 				diagnostics.AddRange(errors.Select(ToDiagnostic));
 
 			if (service != null && !HttpServiceInfo.TryCreate(service, out _, out errors))
@@ -97,9 +112,9 @@ namespace Facility.LanguageServer
 
 			SetService(documentUri, service);
 
-			Router.PublishDiagnostics(new PublishDiagnosticsParams
+			Router.TextDocument.PublishDiagnostics(new PublishDiagnosticsParams
 			{
-				Uri = documentUri,
+				Uri = documentUri.ToUri(),
 				Diagnostics = diagnostics,
 			});
 		}
