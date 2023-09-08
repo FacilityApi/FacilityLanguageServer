@@ -14,8 +14,10 @@ namespace Facility.LanguageServer
 {
 	internal sealed class FsdSyncHandler : FsdRequestHandler, ITextDocumentSyncHandler
 	{
-		public FsdSyncHandler(ILanguageServer router, IDictionary<DocumentUri, ServiceInfo> serviceInfos)
-			: base(router, serviceInfos)
+		public FsdSyncHandler(
+			ILanguageServerConfiguration configuration,
+			IDictionary<DocumentUri, ServiceInfo> serviceInfos)
+			: base(configuration, serviceInfos)
 		{
 			m_parser = new FsdParser();
 		}
@@ -36,29 +38,30 @@ namespace Facility.LanguageServer
 			return new TextDocumentAttributes(uri, "fsd");
 		}
 
-		public async Task<Unit> Handle(DidOpenTextDocumentParams request, CancellationToken cancellationToken)
+		public async Task<Unit> Handle(DidOpenTextDocumentParams notification, CancellationToken cancellationToken)
 		{
-			await ParseAsync(request.TextDocument.Uri, request.TextDocument.Text).ConfigureAwait(false);
+			await ParseAsync(notification.TextDocument.Uri, notification.TextDocument.Text).ConfigureAwait(false);
+			await Configuration.GetScopedConfiguration(notification.TextDocument.Uri, cancellationToken).ConfigureAwait(false);
 			return Unit.Value;
 		}
 
-		public async Task<Unit> Handle(DidChangeTextDocumentParams request, CancellationToken cancellationToken)
+		public async Task<Unit> Handle(DidChangeTextDocumentParams notification, CancellationToken cancellationToken)
 		{
-			foreach (var change in request.ContentChanges)
+			foreach (var change in notification.ContentChanges)
 			{
-				await ParseAsync(request.TextDocument.Uri, change.Text).ConfigureAwait(false);
+				await ParseAsync(notification.TextDocument.Uri, change.Text).ConfigureAwait(false);
 			}
 			return Unit.Value;
 		}
 
-		public async Task<Unit> Handle(DidCloseTextDocumentParams request, CancellationToken cancellationToken)
+		public async Task<Unit> Handle(DidCloseTextDocumentParams notification, CancellationToken cancellationToken)
 		{
-			SetService(request.TextDocument.Uri, null);
+			SetService(notification.TextDocument.Uri, null);
 
 			return Unit.Value;
 		}
 
-		public async Task<Unit> Handle(DidSaveTextDocumentParams request, CancellationToken cancellationToken)
+		public async Task<Unit> Handle(DidSaveTextDocumentParams notification, CancellationToken cancellationToken)
 		{
 			return Unit.Value;
 		}
@@ -108,11 +111,11 @@ namespace Facility.LanguageServer
 
 			SetService(documentUri, service);
 
-			Router.PublishDiagnostics(new PublishDiagnosticsParams
-			{
-				Uri = documentUri.ToUri(),
-				Diagnostics = diagnostics,
-			});
+			// Router.PublishDiagnostics(new PublishDiagnosticsParams
+			// {
+			// 	Uri = documentUri.ToUri(),
+			// 	Diagnostics = diagnostics,
+			// });
 		}
 
 		private static Diagnostic ToDiagnostic(ServiceDefinitionError error) =>

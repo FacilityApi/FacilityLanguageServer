@@ -7,13 +7,15 @@ namespace Facility.LanguageServer
 {
 	internal abstract class FsdRequestHandler
 	{
-		protected FsdRequestHandler(ILanguageServer router, IDictionary<DocumentUri, ServiceInfo> serviceInfos)
+		protected FsdRequestHandler(
+			ILanguageServerConfiguration configuration,
+			IDictionary<DocumentUri, ServiceInfo> serviceInfos)
 		{
-			Router = router;
+			Configuration = configuration;
 			m_services = serviceInfos;
 		}
 
-		protected ILanguageServer Router { get; }
+		protected ILanguageServerConfiguration Configuration { get; }
 
 		protected DocumentSelector DocumentSelector { get; } =
 			new DocumentSelector(

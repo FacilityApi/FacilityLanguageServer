@@ -10,8 +10,10 @@ namespace Facility.LanguageServer
 {
 	internal sealed class FsdHoverHandler : FsdRequestHandler, IHoverHandler
 	{
-		public FsdHoverHandler(ILanguageServer router, IDictionary<DocumentUri, ServiceInfo> serviceInfos)
-			: base(router, serviceInfos)
+		public FsdHoverHandler(
+			ILanguageServerConfiguration configuration,
+			IDictionary<DocumentUri, ServiceInfo> serviceInfos)
+			: base(configuration, serviceInfos)
 		{
 		}
 
