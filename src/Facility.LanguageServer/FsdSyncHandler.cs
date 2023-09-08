@@ -15,9 +15,10 @@ namespace Facility.LanguageServer
 	internal sealed class FsdSyncHandler : FsdRequestHandler, ITextDocumentSyncHandler
 	{
 		public FsdSyncHandler(
+			ILanguageServerFacade router,
 			ILanguageServerConfiguration configuration,
 			IDictionary<DocumentUri, ServiceInfo> serviceInfos)
-			: base(configuration, serviceInfos)
+			: base(router, configuration, serviceInfos)
 		{
 			m_parser = new FsdParser();
 		}
@@ -111,11 +112,11 @@ namespace Facility.LanguageServer
 
 			SetService(documentUri, service);
 
-			// Router.PublishDiagnostics(new PublishDiagnosticsParams
-			// {
-			// 	Uri = documentUri.ToUri(),
-			// 	Diagnostics = diagnostics,
-			// });
+			Router.TextDocument.PublishDiagnostics(new PublishDiagnosticsParams
+			{
+				Uri = documentUri.ToUri(),
+				Diagnostics = diagnostics,
+			});
 		}
 
 		private static Diagnostic ToDiagnostic(ServiceDefinitionError error) =>
