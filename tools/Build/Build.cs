@@ -11,12 +11,16 @@ return BuildRunner.Execute(args, build =>
 			GitAuthor = new GitAuthorInfo("FacilityApiBot", "facilityapi@gmail.com"),
 			SourceCodeUrl = "https://github.com/FacilityApi/FacilityLanguageServer/tree/master/src",
 		},
-		PackageSettings = new DotNetPackageSettings
-		{
-			GitLogin = gitLogin,
-			PushTagOnPublish = x => $"nuget.{x.Version}",
-		},
 	};
 
 	build.AddDotNetTargets(dotNetBuildSettings);
+
+	build.Target("package")
+		.Describe("Builds the publishable output")
+		.ClearActions()
+		.Does(() =>
+		{
+			RunDotNet("publish", "--configuration", "Release", "src/Facility.LanguageServer/Facility.LanguageServer.csproj");
+			RunDotNet("publish", "--configuration", "Release", "--runtime", "win-x64", "-p:PublishSingleFile=true", "--self-contained", "false", "src/Facility.LanguageServer/Facility.LanguageServer.csproj");
+		});
 });
