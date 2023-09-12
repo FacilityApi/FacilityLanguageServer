@@ -2,10 +2,10 @@
 
 Language Server Protocol server for the [Facility API Framework](https://facilityapi.github.io/).
 
-[![Build Status](https://travis-ci.org/FacilityApi/FacilityLanguageServer.svg?branch=master)](https://travis-ci.org/FacilityApi/FacilityLanguageServer)
-[![Build Status](https://ci.appveyor.com/api/projects/status/hpyavxt83gfqd491?svg=true)](https://ci.appveyor.com/project/ejball/FacilityLanguageServer)
-[![Coverage Status](https://coveralls.io/repos/github/FacilityApi/FacilityLanguageServer/badge.svg?branch=master)](https://coveralls.io/github/FacilityApi/FacilityLanguageServer?branch=master)
+[![Build](https://github.com/FacilityApi/FacilityLanguageServer/workflows/Build/badge.svg)](https://github.com/FacilityApi/FacilityLanguageServer/actions?query=workflow%3ABuild)
 
 ## Facility.LanguageServer
 
 Language server for Facility Service Definition documents.
+
+See [FacilityVSCode](https://github.com/FacilityApi/FacilityVSCode) and [FacilityVisualStudio](https://github.com/FacilityApi/FacilityVisualStudio) for extensions that use this server.
