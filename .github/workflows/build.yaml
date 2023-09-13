@@ -41,15 +41,13 @@ jobs:
     - name: Package
       if: runner.os == 'Windows'
       run: .\build.ps1 package --skip build
-    - name: Upload Facility.LanguageServer artifacts
-      if: runner.os == 'Windows'
-      uses: actions/upload-artifact@v3
-      with:
-        name: Facility.LanguageServer
-        path: src/Facility.LanguageServer/bin/Release/net6.0/publish/
-    - name: Upload Facility.LanguageServer win-x64 artifacts
-      if: runner.os == 'Windows'
-      uses: actions/upload-artifact@v3
-      with:
-        name: Facility.LanguageServer-win-x64
-        path: src/Facility.LanguageServer/bin/Release/net6.0/win-x64/publish/
+    - name: Upload artifacts
+      if: runner.os == 'Windows' && startsWith(github.ref, 'refs/tags/')
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        mkdir release
+        Compress-Archive -Path ./src/Facility.LanguageServer/bin/Release/net6.0/publish/* -DestinationPath release/Facility.LanguageServer.zip
+        Compress-Archive -Path ./src/Facility.LanguageServer/bin/Release/net6.0/win-x64/publish/* -DestinationPath release/Facility.LanguageServer-win-x64.zip
+        $tagName = $env:GITHUB_REF -replace 'refs/tags/', ''
+        gh release upload $tagName release/*
