@@ -51,4 +51,4 @@ jobs:
         mkdir release
         Compress-Archive -Path ./src/Facility.LanguageServer/bin/Release/net6.0/publish/* -DestinationPath release/Facility.LanguageServer.zip
         Compress-Archive -Path ./src/Facility.LanguageServer/bin/Release/net6.0/win-x64/publish/* -DestinationPath release/Facility.LanguageServer-win-x64.zip
-        gh release upload ${{ github.event.release.tag_name }} release/*
+        gh release upload ${{ github.event.release.tag_name }} .\release\Facility.LanguageServer.zip .\release\Facility.LanguageServer-win-x64.zip
