@@ -23,8 +23,12 @@ namespace Facility.LanguageServer
 			{
 				case ServiceTypeKind.Dto:
 					return type.Dto!.Name;
+				case ServiceTypeKind.ExternalDto:
+					return type.ExternalDto!.Name;
 				case ServiceTypeKind.Enum:
 					return type.Enum!.Name;
+				case ServiceTypeKind.ExternalEnum:
+					return type.ExternalEnum!.Name;
 				case ServiceTypeKind.Array:
 				case ServiceTypeKind.Result:
 				case ServiceTypeKind.Map:
