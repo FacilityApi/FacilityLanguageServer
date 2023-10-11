@@ -28,7 +28,7 @@ namespace Facility.LanguageServer
 					var part = member.GetPart(ServicePartKind.Name);
 					var name = member.Name;
 
-					return new { part, name };
+					return (part, name);
 				})
 				.Where(x => x.part != null && requestPosition >= x.part.Position && requestPosition < x.part.EndPosition)
 				.Select(x => x.name)
@@ -43,7 +43,7 @@ namespace Facility.LanguageServer
 					var part = field.GetPart(ServicePartKind.TypeName);
 					var typeName = GetFieldTypeName(field);
 
-					return new { part, typeName };
+					return (part, typeName);
 				})
 				.Where(x => x.part != null && requestPosition >= x.part.Position && requestPosition < x.part.EndPosition)
 				.Select(x => x.typeName)
@@ -58,7 +58,7 @@ namespace Facility.LanguageServer
 					var type = service.GetFieldType(field);
 					var memberTypeName = type?.GetMemberTypeName();
 
-					return new { part, memberTypeName, typeName };
+					return (part, memberTypeName, typeName);
 				})
 				.Where(x => x.part != null && ((memberNameAtCursor != null && x.memberTypeName == memberNameAtCursor) || x.typeName == fieldTypeNameAtCursor))
 				.Select(x => x.part);
