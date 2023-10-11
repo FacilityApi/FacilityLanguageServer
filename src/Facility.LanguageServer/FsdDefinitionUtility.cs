@@ -41,7 +41,7 @@ namespace Facility.LanguageServer
 				.Select(field =>
 				{
 					var part = field.GetPart(ServicePartKind.TypeName);
-					var typeName = field.TypeName;
+					var typeName = GetFieldTypeName(field);
 
 					return new { part, typeName };
 				})
@@ -53,7 +53,7 @@ namespace Facility.LanguageServer
 				.Select(field =>
 				{
 					var part = field.GetPart(ServicePartKind.TypeName);
-					var typeName = field.TypeName;
+					var typeName = GetFieldTypeName(field);
 
 					var type = service.GetFieldType(field);
 					var memberTypeName = type?.GetMemberTypeName();
@@ -82,6 +82,16 @@ namespace Facility.LanguageServer
 					return type.ValueType.GetMemberTypeName();
 			}
 			return null;
+		}
+
+		private static string GetFieldTypeName(this ServiceFieldInfo field)
+		{
+			return field.TypeName
+				.Replace("[]", "", StringComparison.Ordinal)
+				.Replace("map<", "", StringComparison.Ordinal)
+				.Replace("nullable<", "", StringComparison.Ordinal)
+				.Replace("result<", "", StringComparison.Ordinal)
+				.Replace(">", "", StringComparison.Ordinal);
 		}
 	}
 }
