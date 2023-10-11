@@ -87,7 +87,11 @@ namespace Facility.LanguageServer
 		private static string GetFieldTypeName(this ServiceInfo service, ServiceFieldInfo field)
 		{
 			var type = service.GetFieldType(field);
-			return type?.ValueType?.ToString() ?? type?.ToString() ?? field.TypeName;
+
+			while (type?.ValueType is { } valueType)
+				type = valueType;
+
+			return type?.ToString() ?? field.TypeName;
 		}
 	}
 }
