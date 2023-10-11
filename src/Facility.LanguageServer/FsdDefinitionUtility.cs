@@ -21,7 +21,7 @@ namespace Facility.LanguageServer
 		{
 			var members = service.GetDescendants().OfType<ServiceMemberInfo>().ToList().AsReadOnly();
 
-			// memberNameAtPosition will be null if the cursor is not on a member name.
+			// memberNameAtCursor will be null if the cursor is not on a member name.
 			var memberNameAtCursor = members
 				.Select(member =>
 				{
@@ -36,7 +36,7 @@ namespace Facility.LanguageServer
 
 			var fields = service.GetDescendants().OfType<ServiceFieldInfo>().ToList().AsReadOnly();
 
-			// fieldTypeNameAtPosition will be null if the cursor is not on a field type name.
+			// fieldTypeNameAtCursor will be null if the cursor is not on a field type name.
 			var fieldTypeNameAtCursor = fields
 				.Select(field =>
 				{
