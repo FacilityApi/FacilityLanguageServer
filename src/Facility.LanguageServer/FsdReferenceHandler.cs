@@ -38,11 +38,7 @@ namespace Facility.LanguageServer
 			var locations = serviceParts.Select(part => new Location()
 			{
 				Uri = documentUri,
-				Range = new Range(
-						new OmniSharp.Extensions.LanguageServer.Protocol.Models
-							.Position(part!.Position.LineNumber - 1, part.Position.ColumnNumber - 1),
-						new OmniSharp.Extensions.LanguageServer.Protocol.Models
-							.Position(part.EndPosition.LineNumber - 1, part.EndPosition.ColumnNumber - 1)),
+				Range = new Range(new Position(part!.Position), new Position(part.EndPosition)),
 			});
 
 			return new LocationContainer(locations);
