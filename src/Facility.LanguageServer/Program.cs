@@ -26,6 +26,7 @@ var server = await LanguageServer.From(
 					.AddSingleton<IDictionary<DocumentUri, ServiceInfo>>(serviceInfos))
 			.WithHandler<FsdSyncHandler>()
 			.WithHandler<FsdDefinitionHandler>()
+			.WithHandler<FsdReferenceHandler>()
 			.WithHandler<FsdHoverHandler>()
 			.WithServices(
 				x => x
