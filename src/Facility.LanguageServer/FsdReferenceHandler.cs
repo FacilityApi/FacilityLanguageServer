@@ -33,7 +33,7 @@ namespace Facility.LanguageServer
 
 			var position = new Position(request.Position);
 
-			var serviceParts = service.GetReferencedServicePartsAtPosition(position);
+			var serviceParts = service.GetReferencedServicePartsAtPosition(position, request.Context.IncludeDeclaration);
 
 			var locations = serviceParts.Select(part => new Location()
 			{

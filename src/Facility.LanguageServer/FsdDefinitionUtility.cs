@@ -17,12 +17,12 @@ namespace Facility.LanguageServer
 				select service.FindMember(name)).FirstOrDefault();
 		}
 
-		public static IEnumerable<ServicePart> GetReferencedServicePartsAtPosition(this ServiceInfo service, Position requestPosition)
+		public static IEnumerable<ServicePart> GetReferencedServicePartsAtPosition(this ServiceInfo service, Position requestPosition, bool includeDeclaration)
 		{
 			var members = service.GetDescendants().OfType<ServiceMemberInfo>().ToList().AsReadOnly();
 
-			// memberNameAtCursor will be null if the cursor is not on a member name.
-			var memberNameAtCursor = members
+			// memberAtCursor will be null if the cursor is not on a member name.
+			var memberAtCursor = members
 				.Select(member =>
 				{
 					var part = member.GetPart(ServicePartKind.Name);
@@ -31,7 +31,7 @@ namespace Facility.LanguageServer
 					return (part, name);
 				})
 				.Where(x => x.part != null && requestPosition >= x.part.Position && requestPosition < x.part.EndPosition)
-				.Select(x => x.name)
+				.Select(x => (x.name, x.part))
 				.FirstOrDefault();
 
 			var fields = service.GetDescendants().OfType<ServiceFieldInfo>().ToList().AsReadOnly();
@@ -49,7 +49,7 @@ namespace Facility.LanguageServer
 				.Select(x => x.typeName)
 				.FirstOrDefault();
 
-			return fields
+			var referencedFields = fields
 				.Select(field =>
 				{
 					var part = field.GetPart(ServicePartKind.TypeName);
@@ -60,8 +60,23 @@ namespace Facility.LanguageServer
 
 					return (part, memberTypeName, typeName);
 				})
-				.Where(x => x.part != null && ((memberNameAtCursor != null && x.memberTypeName == memberNameAtCursor) || x.typeName == fieldTypeNameAtCursor))
+				.Where(x => x.part != null && ((memberAtCursor.name != null && x.memberTypeName == memberAtCursor.name) || x.typeName == fieldTypeNameAtCursor))
 				.Select(x => x.part);
+
+			var referencedMembers = members
+				.Select(member =>
+				{
+					var part = member.GetPart(ServicePartKind.Name);
+					var name = member.Name;
+
+					return (part, name);
+				})
+				.Where(x => x.part != null && x.name == fieldTypeNameAtCursor)
+				.Select(x => x.part);
+
+			return includeDeclaration
+				? referencedFields.Concat(referencedMembers)
+				: referencedFields;
 		}
 
 		private static string GetMemberTypeName(this ServiceTypeInfo type)
