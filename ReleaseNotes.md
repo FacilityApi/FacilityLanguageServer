@@ -1,5 +1,9 @@
 # Release Notes
 
+## 2.1.0
+* Fix definition handler for External members.
+* Add reference handler.
+
 ## 2.0.0
 
 * Update LSP spec support.
