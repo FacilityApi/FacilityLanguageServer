@@ -36,6 +36,7 @@ namespace Facility.LanguageServer
 					ServiceEnumInfo => SymbolKind.Enum,
 					ServiceExternalDtoInfo => SymbolKind.Interface,
 					ServiceExternalEnumInfo => SymbolKind.Enum,
+					ServiceErrorSetInfo => SymbolKind.Interface,
 					_ => SymbolKind.Null,
 				};
 
@@ -43,7 +44,7 @@ namespace Facility.LanguageServer
 				var maxLine = memberNamePart.EndPosition.LineNumber;
 
 				var childSymbols = new List<DocumentSymbol>();
-				foreach (var child in member.GetDescendants().OfType<ServiceFieldInfo>())
+				foreach (var child in member.GetDescendants().OfType<ServiceElementWithAttributesInfo>())
 				{
 					var childNamePart = child.GetPart(ServicePartKind.Name);
 					if (childNamePart == null)
@@ -54,15 +55,25 @@ namespace Facility.LanguageServer
 
 					var childTypePart = child.GetPart(ServicePartKind.TypeName);
 
+					var childName = child switch
+					{
+						ServiceFieldInfo field => field.Name,
+						ServiceErrorInfo error => error.Name,
+						_ => null,
+					};
+
+					if (childName == null)
+						continue;
+
 					var childSymbol = new DocumentSymbol
 					{
-						Name = child.Name,
+						Name = childName,
 						Kind = SymbolKind.Field,
 						Range = new Range(
 							new Position(childNamePart.Position),
 							new Position(
 								new ServiceDefinitionPosition(
-									child.Name,
+									childName,
 									childTypePart?.EndPosition.LineNumber ?? childNamePart.EndPosition.LineNumber,
 									childTypePart?.EndPosition.ColumnNumber ?? childNamePart.EndPosition.ColumnNumber))),
 						SelectionRange = new Range(
