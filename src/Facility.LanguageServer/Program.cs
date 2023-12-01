@@ -28,6 +28,7 @@ var server = await LanguageServer.From(
 			.WithHandler<FsdDefinitionHandler>()
 			.WithHandler<FsdReferenceHandler>()
 			.WithHandler<FsdHoverHandler>()
+			.WithHandler<FsdDocumentSymbolHandler>()
 			.WithServices(
 				x => x
 					.AddLogging(b => b.SetMinimumLevel(LogLevel.Trace)))).ConfigureAwait(false);
