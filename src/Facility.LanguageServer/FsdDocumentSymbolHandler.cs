@@ -51,12 +51,23 @@ namespace Facility.LanguageServer
 
 					maxColumn = Math.Max(maxColumn, childNamePart.EndPosition.ColumnNumber);
 					maxLine = Math.Max(maxLine, childNamePart.EndPosition.LineNumber);
+
+					var childTypePart = child.GetPart(ServicePartKind.TypeName);
+
 					var childSymbol = new DocumentSymbol
 					{
 						Name = child.Name,
 						Kind = SymbolKind.Field,
-						Range = new Range(new Position(childNamePart.Position), new Position(childNamePart.EndPosition)),
-						SelectionRange = new Range(new Position(childNamePart.Position), new Position(childNamePart.EndPosition)),
+						Range = new Range(
+							new Position(childNamePart.Position),
+							new Position(
+								new ServiceDefinitionPosition(
+									child.Name,
+									childTypePart?.EndPosition.LineNumber ?? childNamePart.EndPosition.LineNumber,
+									childTypePart?.EndPosition.ColumnNumber ?? childNamePart.EndPosition.ColumnNumber))),
+						SelectionRange = new Range(
+							new Position(childNamePart.Position),
+							new Position(childNamePart.EndPosition)),
 					};
 					childSymbols.Add(childSymbol);
 				}
@@ -73,8 +84,12 @@ namespace Facility.LanguageServer
 					{
 						Name = child.Name,
 						Kind = SymbolKind.EnumMember,
-						Range = new Range(new Position(childNamePart.Position), new Position(childNamePart.EndPosition)),
-						SelectionRange = new Range(new Position(childNamePart.Position), new Position(childNamePart.EndPosition)),
+						Range = new Range(
+							new Position(childNamePart.Position),
+							new Position(childNamePart.EndPosition)),
+						SelectionRange = new Range(
+							new Position(childNamePart.Position),
+							new Position(childNamePart.EndPosition)),
 					};
 					childSymbols.Add(childSymbol);
 				}
@@ -88,8 +103,14 @@ namespace Facility.LanguageServer
 					Name = member.Name,
 					Kind = symbolKind,
 
-					Range = new Range(new Position(new ServiceDefinitionPosition(member.Name, minLine, minColumn)), new Position(new ServiceDefinitionPosition(member.Name, maxLine + 1, maxColumn))),
-					SelectionRange = new Range(new Position(memberNamePart.Position), new Position(memberNamePart.EndPosition)),
+					Range = new Range(
+						new Position(
+							new ServiceDefinitionPosition(member.Name, minLine, minColumn)),
+						new Position(
+							new ServiceDefinitionPosition(member.Name, maxLine + 1, maxColumn))),
+					SelectionRange = new Range(
+						new Position(memberNamePart.Position),
+						new Position(memberNamePart.EndPosition)),
 					Children = childSymbols,
 				};
 				symbols.Add(symbol);
