@@ -1,5 +1,8 @@
 # Release Notes
 
+## 2.2.0
+* Add document symbol handler.
+
 ## 2.1.0
 * Fix definition handler for External members.
 * Add reference handler.
