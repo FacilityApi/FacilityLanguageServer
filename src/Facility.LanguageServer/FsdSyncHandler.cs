@@ -20,7 +20,7 @@ namespace Facility.LanguageServer
 			IDictionary<DocumentUri, ServiceInfo> serviceInfos)
 			: base(router, configuration, serviceInfos)
 		{
-			m_parser = new FsdParser();
+			m_parser = new FsdParser(new FsdParserSettings { SupportsEvents = true });
 		}
 
 		public TextDocumentSyncOptions Options { get; } =

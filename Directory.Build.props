@@ -32,10 +32,6 @@
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <FacilityVersion>2.11.0</FacilityVersion>
-  </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Faithlife.Analyzers" Version="1.4.0" PrivateAssets="All" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
