@@ -1,7 +1,7 @@
 <Project>
 
   <PropertyGroup>
-    <VersionPrefix>2.2.0</VersionPrefix>
+    <VersionPrefix>2.3.0</VersionPrefix>
     <LangVersion>11.0</LangVersion>
     <Nullable>warnings</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -30,10 +30,6 @@
   <PropertyGroup Condition=" '$(BuildNumber)' != '' ">
     <AssemblyVersion>$(VersionPrefix).$(BuildNumber)</AssemblyVersion>
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <FacilityVersion>2.11.0</FacilityVersion>
   </PropertyGroup>
 
   <ItemGroup>
