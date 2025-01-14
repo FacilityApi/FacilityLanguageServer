@@ -7,8 +7,8 @@ on:
     - 'docs/**'
     branches:
     - 'master'
-    tags-ignore:
-    - '**'
+    tags:
+    - 'v*'
   pull_request:
     paths-ignore:
     - '*.md'
