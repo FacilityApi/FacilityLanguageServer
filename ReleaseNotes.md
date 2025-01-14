@@ -1,5 +1,9 @@
 # Release Notes
 
+## 2.4.0
+
+* Support `float` field type.
+
 ## 2.3.0
 
 * Support events.
