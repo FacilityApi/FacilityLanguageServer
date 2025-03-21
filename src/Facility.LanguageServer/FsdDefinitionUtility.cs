@@ -71,7 +71,7 @@ namespace Facility.LanguageServer
 
 					return (part, name);
 				})
-				.Where(x => x.part != null && x.name == fieldTypeNameAtCursor)
+				.Where(x => x.part != null && (x.name == fieldTypeNameAtCursor || x.name == memberAtCursor.name))
 				.Select(x => x.part);
 
 			return includeDeclaration
