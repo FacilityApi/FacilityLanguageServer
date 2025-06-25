@@ -58,10 +58,10 @@ namespace Facility.LanguageServer
 					var type = service.GetFieldType(field);
 					var memberTypeName = type?.GetMemberTypeName();
 
-					return (part, memberTypeName, typeName);
+					return (part, memberTypeName, typeName, type);
 				})
 				.Where(x => x.part != null && ((memberAtCursor.name != null && x.memberTypeName == memberAtCursor.name) || x.typeName == fieldTypeNameAtCursor))
-				.Select(x => x.part);
+				.Select(x => GetPositionWithoutArrayBrackets(x.part, x.type));
 
 			var referencedMembers = members
 				.Select(member =>
@@ -108,5 +108,10 @@ namespace Facility.LanguageServer
 
 			return type?.ToString() ?? field.TypeName;
 		}
+
+		public static ServicePart GetPositionWithoutArrayBrackets(ServicePart part, ServiceTypeInfo type) =>
+			type.Kind == ServiceTypeKind.Array
+				? new ServicePart(part.Kind, part.Position, new ServiceDefinitionPosition(part.EndPosition.Name, part.EndPosition.LineNumber, part.EndPosition.ColumnNumber - 2))
+				: part;
 	}
 }
