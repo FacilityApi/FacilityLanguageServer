@@ -57,7 +57,7 @@ internal sealed class FsdRenameHandler : FsdRequestHandler, IRenameHandler, IPre
 				var type = service.GetFieldType(field);
 				var part = field.GetPart(ServicePartKind.TypeName);
 
-				if (type is null || part is null || !m_isRenamable.Contains(type.Kind))
+				if (type is null || part is null || !s_isRenamable.Contains(type.Kind))
 					return null;
 
 				part = FsdDefinitionUtility.GetPositionWithoutArrayBrackets(part, type);
@@ -106,7 +106,7 @@ internal sealed class FsdRenameHandler : FsdRequestHandler, IRenameHandler, IPre
 		};
 	}
 
-	private readonly HashSet<ServiceTypeKind> m_isRenamable = new()
+	private static readonly HashSet<ServiceTypeKind> s_isRenamable = new()
 	{
 		ServiceTypeKind.Dto,
 		ServiceTypeKind.ExternalDto,
