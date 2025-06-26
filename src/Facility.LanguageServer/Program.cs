@@ -20,17 +20,15 @@ var server = await LanguageServer.From(
 			.ConfigureLogging(
 				x => x
 					.AddLanguageProtocolLogging()
-					.SetMinimumLevel(LogLevel.Debug))
+					.SetMinimumLevel(LogLevel.Information))
 			.WithServices(
 				services => services
 					.AddSingleton<IDictionary<DocumentUri, ServiceInfo>>(serviceInfos))
 			.WithHandler<FsdSyncHandler>()
 			.WithHandler<FsdDefinitionHandler>()
 			.WithHandler<FsdReferenceHandler>()
+			.WithHandler<FsdRenameHandler>()
 			.WithHandler<FsdHoverHandler>()
-			.WithHandler<FsdDocumentSymbolHandler>()
-			.WithServices(
-				x => x
-					.AddLogging(b => b.SetMinimumLevel(LogLevel.Trace)))).ConfigureAwait(false);
+			.WithHandler<FsdDocumentSymbolHandler>()).ConfigureAwait(false);
 
 await server.WaitForExit.ConfigureAwait(false);
