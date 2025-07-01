@@ -60,7 +60,7 @@ internal sealed class FsdRenameHandler : FsdRequestHandler, IRenameHandler, IPre
 				if (type is null || part is null || !s_isRenamable.Contains(type.Kind))
 					return null;
 
-				part = FsdDefinitionUtility.GetPositionWithoutArrayBrackets(part, type);
+				part = FsdDefinitionUtility.GetValueTypePart(field.TypeName, part);
 				return new Range(new Position(part.Position), new Position(part.EndPosition));
 			})
 			.FirstOrDefault(range => range != null && request.Position >= range.Start && request.Position < range.End);
