@@ -27,7 +27,7 @@ namespace Facility.LanguageServer
 					var name = member.Name;
 
 					return (part, name);
-				});
+				}).ToList().AsReadOnly();
 
 			// memberAtCursor will be null if the cursor is not on a member name.
 			var memberNameAtCursor = memberParts
@@ -46,7 +46,7 @@ namespace Facility.LanguageServer
 					var valueTypeName = type?.GetValueTypeName();
 
 					return (valueTypePart, valueTypeName);
-				});
+				}).ToList().AsReadOnly();
 
 			// fieldTypeNameAtCursor will be null if the cursor is not on a field type name.
 			var fieldValueTypeNameAtCursor = fieldValueTypeParts
