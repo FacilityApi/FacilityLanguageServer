@@ -37,6 +37,7 @@ internal sealed class FsdRenameHandler : FsdRequestHandler, IRenameHandler, IPre
 		members.AddRange(service.GetDescendants().OfType<ServiceExternalDtoInfo>());
 		members.AddRange(service.GetDescendants().OfType<ServiceEnumInfo>());
 		members.AddRange(service.GetDescendants().OfType<ServiceExternalEnumInfo>());
+
 		var memberRangeAtCursor = members
 			.Select(member =>
 			{
@@ -54,14 +55,16 @@ internal sealed class FsdRenameHandler : FsdRequestHandler, IRenameHandler, IPre
 		var fieldRangeAtCursor = fields
 			.Select(field =>
 			{
-				var type = service.GetFieldType(field);
 				var part = field.GetPart(ServicePartKind.TypeName);
+				var valueTypePart = FsdDefinitionUtility.GetValueTypePart(field.TypeName, part);
 
-				if (type is null || part is null || !s_isRenamable.Contains(type.Kind))
+				var type = service.GetFieldType(field);
+				var valueType = type.GetValueType();
+
+				if (type is null || valueTypePart is null || !s_isRenamable.Contains(valueType.Kind))
 					return null;
 
-				part = FsdDefinitionUtility.GetValueTypePart(field.TypeName, part);
-				return new Range(new Position(part.Position), new Position(part.EndPosition));
+				return new Range(new Position(valueTypePart.Position), new Position(valueTypePart.EndPosition));
 			})
 			.FirstOrDefault(range => range != null && request.Position >= range.Start && request.Position < range.End);
 
@@ -112,9 +115,5 @@ internal sealed class FsdRenameHandler : FsdRequestHandler, IRenameHandler, IPre
 		ServiceTypeKind.ExternalDto,
 		ServiceTypeKind.Enum,
 		ServiceTypeKind.ExternalEnum,
-		ServiceTypeKind.Array,
-		ServiceTypeKind.Nullable,
-		ServiceTypeKind.Map,
-		ServiceTypeKind.Result,
 	};
 }

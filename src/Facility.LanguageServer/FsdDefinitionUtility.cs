@@ -67,27 +67,6 @@ namespace Facility.LanguageServer
 				: referencedFields;
 		}
 
-		private static string GetValueTypeName(this ServiceTypeInfo type)
-		{
-			switch (type.Kind)
-			{
-				case ServiceTypeKind.Dto:
-					return type.Dto!.Name;
-				case ServiceTypeKind.ExternalDto:
-					return type.ExternalDto!.Name;
-				case ServiceTypeKind.Enum:
-					return type.Enum!.Name;
-				case ServiceTypeKind.ExternalEnum:
-					return type.ExternalEnum!.Name;
-				case ServiceTypeKind.Array:
-				case ServiceTypeKind.Result:
-				case ServiceTypeKind.Map:
-				case ServiceTypeKind.Nullable:
-					return type.ValueType.GetValueTypeName();
-			}
-			return type.ToString();
-		}
-
 		public static ServicePart GetValueTypePart(string text, ServicePart part)
 		{
 			var arrayValueType = TryPrefixSuffix(text, "", "[]");
@@ -107,6 +86,35 @@ namespace Facility.LanguageServer
 				return GetValueTypePart(resultValueType, TruncatePart(ServicePartKind.TypeName, part, 7, 1));
 
 			return part;
+		}
+
+		public static ServiceTypeInfo GetValueType(this ServiceTypeInfo type)
+		{
+			var valueType = type;
+			while (valueType?.ValueType is not null)
+				valueType = valueType.ValueType;
+			return valueType;
+		}
+
+		private static string GetValueTypeName(this ServiceTypeInfo type)
+		{
+			switch (type.Kind)
+			{
+				case ServiceTypeKind.Dto:
+					return type.Dto!.Name;
+				case ServiceTypeKind.ExternalDto:
+					return type.ExternalDto!.Name;
+				case ServiceTypeKind.Enum:
+					return type.Enum!.Name;
+				case ServiceTypeKind.ExternalEnum:
+					return type.ExternalEnum!.Name;
+				case ServiceTypeKind.Array:
+				case ServiceTypeKind.Result:
+				case ServiceTypeKind.Map:
+				case ServiceTypeKind.Nullable:
+					return type.ValueType.GetValueTypeName();
+			}
+			return type.ToString();
 		}
 
 		private static ServicePart TruncatePart(ServicePartKind newKind, ServicePart part, int truncateLeft, int truncateRight) =>
