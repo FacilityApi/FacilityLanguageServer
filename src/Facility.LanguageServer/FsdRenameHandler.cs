@@ -113,5 +113,8 @@ internal sealed class FsdRenameHandler : FsdRequestHandler, IRenameHandler, IPre
 		ServiceTypeKind.Enum,
 		ServiceTypeKind.ExternalEnum,
 		ServiceTypeKind.Array,
+		ServiceTypeKind.Nullable,
+		ServiceTypeKind.Map,
+		ServiceTypeKind.Result,
 	};
 }
