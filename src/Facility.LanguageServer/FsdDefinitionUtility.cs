@@ -12,7 +12,7 @@ namespace Facility.LanguageServer
 				where part != null && requestPosition >= part.Position && requestPosition < part.EndPosition
 				let type = service.GetFieldType(field)
 				where type != null
-				let name = type.GetValueTypeName()
+				let name = type.GetValueType().ToString()
 				where name != null
 				select service.FindMember(name)).FirstOrDefault();
 		}
@@ -43,7 +43,7 @@ namespace Facility.LanguageServer
 					var valueTypePart = GetValueTypePart(field.TypeName, part);
 
 					var type = service.GetFieldType(field);
-					var valueTypeName = type?.GetValueTypeName();
+					var valueTypeName = type?.GetValueType().ToString();
 
 					return (valueTypePart, valueTypeName);
 				}).ToList().AsReadOnly();
@@ -94,27 +94,6 @@ namespace Facility.LanguageServer
 			while (valueType?.ValueType is not null)
 				valueType = valueType.ValueType;
 			return valueType;
-		}
-
-		private static string GetValueTypeName(this ServiceTypeInfo type)
-		{
-			switch (type.Kind)
-			{
-				case ServiceTypeKind.Dto:
-					return type.Dto!.Name;
-				case ServiceTypeKind.ExternalDto:
-					return type.ExternalDto!.Name;
-				case ServiceTypeKind.Enum:
-					return type.Enum!.Name;
-				case ServiceTypeKind.ExternalEnum:
-					return type.ExternalEnum!.Name;
-				case ServiceTypeKind.Array:
-				case ServiceTypeKind.Result:
-				case ServiceTypeKind.Map:
-				case ServiceTypeKind.Nullable:
-					return type.ValueType.GetValueTypeName();
-			}
-			return type.ToString();
 		}
 
 		private static ServicePart TruncatePart(ServicePartKind newKind, ServicePart part, int truncateLeft, int truncateRight) =>
