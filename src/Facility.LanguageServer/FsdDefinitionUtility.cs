@@ -29,7 +29,7 @@ namespace Facility.LanguageServer
 					return (part, name);
 				}).ToList().AsReadOnly();
 
-			// memberAtCursor will be null if the cursor is not on a member name.
+			// will be null if the cursor is not on a member name.
 			var memberNameAtCursor = memberParts
 				.Where(x => x.part != null && requestPosition >= x.part.Position && requestPosition < x.part.EndPosition)
 				.Select(x => x.name)
@@ -48,7 +48,7 @@ namespace Facility.LanguageServer
 					return (valueTypePart, valueTypeName);
 				}).ToList().AsReadOnly();
 
-			// fieldTypeNameAtCursor will be null if the cursor is not on a field type name.
+			// will be null if the cursor is not on a field type name.
 			var fieldValueTypeNameAtCursor = fieldValueTypeParts
 				.Where(x => x.valueTypePart != null && requestPosition >= x.valueTypePart.Position && requestPosition < x.valueTypePart.EndPosition)
 				.Select(x => x.valueTypeName)

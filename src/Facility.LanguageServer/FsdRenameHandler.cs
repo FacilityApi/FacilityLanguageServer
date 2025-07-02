@@ -38,6 +38,7 @@ internal sealed class FsdRenameHandler : FsdRequestHandler, IRenameHandler, IPre
 		members.AddRange(service.GetDescendants().OfType<ServiceEnumInfo>());
 		members.AddRange(service.GetDescendants().OfType<ServiceExternalEnumInfo>());
 
+		// will be null if the cursor is not on a member name.
 		var memberRangeAtCursor = members
 			.Select(member =>
 			{
@@ -52,6 +53,8 @@ internal sealed class FsdRenameHandler : FsdRequestHandler, IRenameHandler, IPre
 			return Task.FromResult<RangeOrPlaceholderRange>(memberRangeAtCursor);
 
 		var fields = service.GetDescendants().OfType<ServiceFieldInfo>().ToList().AsReadOnly();
+
+		// will be null if the cursor is not on a field type name.
 		var fieldRangeAtCursor = fields
 			.Select(field =>
 			{
