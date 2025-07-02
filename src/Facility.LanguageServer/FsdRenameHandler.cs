@@ -37,6 +37,8 @@ internal sealed class FsdRenameHandler : FsdRequestHandler, IRenameHandler, IPre
 		members.AddRange(service.GetDescendants().OfType<ServiceExternalDtoInfo>());
 		members.AddRange(service.GetDescendants().OfType<ServiceEnumInfo>());
 		members.AddRange(service.GetDescendants().OfType<ServiceExternalEnumInfo>());
+
+		// will be null if the cursor is not on a member name.
 		var memberRangeAtCursor = members
 			.Select(member =>
 			{
@@ -51,17 +53,21 @@ internal sealed class FsdRenameHandler : FsdRequestHandler, IRenameHandler, IPre
 			return Task.FromResult<RangeOrPlaceholderRange>(memberRangeAtCursor);
 
 		var fields = service.GetDescendants().OfType<ServiceFieldInfo>().ToList().AsReadOnly();
+
+		// will be null if the cursor is not on a field type name.
 		var fieldRangeAtCursor = fields
 			.Select(field =>
 			{
-				var type = service.GetFieldType(field);
 				var part = field.GetPart(ServicePartKind.TypeName);
+				var valueTypePart = FsdDefinitionUtility.GetValueTypePart(field.TypeName, part);
 
-				if (type is null || part is null || !s_isRenamable.Contains(type.Kind))
+				var type = service.GetFieldType(field);
+				var valueType = type.GetValueType();
+
+				if (type is null || valueTypePart is null || !s_isRenamable.Contains(valueType.Kind))
 					return null;
 
-				part = FsdDefinitionUtility.GetPositionWithoutArrayBrackets(part, type);
-				return new Range(new Position(part.Position), new Position(part.EndPosition));
+				return new Range(new Position(valueTypePart.Position), new Position(valueTypePart.EndPosition));
 			})
 			.FirstOrDefault(range => range != null && request.Position >= range.Start && request.Position < range.End);
 
@@ -112,6 +118,5 @@ internal sealed class FsdRenameHandler : FsdRequestHandler, IRenameHandler, IPre
 		ServiceTypeKind.ExternalDto,
 		ServiceTypeKind.Enum,
 		ServiceTypeKind.ExternalEnum,
-		ServiceTypeKind.Array,
 	};
 }
