@@ -12,7 +12,7 @@ namespace Facility.LanguageServer
 				where part != null && requestPosition >= part.Position && requestPosition < part.EndPosition
 				let type = service.GetFieldType(field)
 				where type != null
-				let name = type.GetMemberTypeName()
+				let name = type.GetValueType().ToString()
 				where name != null
 				select service.FindMember(name)).FirstOrDefault();
 		}
@@ -20,58 +20,46 @@ namespace Facility.LanguageServer
 		public static IEnumerable<ServicePart> GetReferencedServicePartsAtPosition(this ServiceInfo service, Position requestPosition, bool includeDeclaration)
 		{
 			var members = service.GetDescendants().OfType<ServiceMemberInfo>().ToList().AsReadOnly();
-
-			// memberAtCursor will be null if the cursor is not on a member name.
-			var memberAtCursor = members
+			var memberParts = members
 				.Select(member =>
 				{
 					var part = member.GetPart(ServicePartKind.Name);
 					var name = member.Name;
 
 					return (part, name);
-				})
+				}).ToList().AsReadOnly();
+
+			// will be null if the cursor is not on a member name.
+			var memberNameAtCursor = memberParts
 				.Where(x => x.part != null && requestPosition >= x.part.Position && requestPosition < x.part.EndPosition)
-				.Select(x => (x.name, x.part))
+				.Select(x => x.name)
 				.FirstOrDefault();
 
 			var fields = service.GetDescendants().OfType<ServiceFieldInfo>().ToList().AsReadOnly();
-
-			// fieldTypeNameAtCursor will be null if the cursor is not on a field type name.
-			var fieldTypeNameAtCursor = fields
+			var fieldValueTypeParts = fields
 				.Select(field =>
 				{
 					var part = field.GetPart(ServicePartKind.TypeName);
-					var typeName = service.GetFieldTypeName(field);
-
-					return (part, typeName);
-				})
-				.Where(x => x.part != null && requestPosition >= x.part.Position && requestPosition < x.part.EndPosition)
-				.Select(x => x.typeName)
-				.FirstOrDefault();
-
-			var referencedFields = fields
-				.Select(field =>
-				{
-					var part = field.GetPart(ServicePartKind.TypeName);
-					var typeName = service.GetFieldTypeName(field);
+					var valueTypePart = GetValueTypePart(field.TypeName, part);
 
 					var type = service.GetFieldType(field);
-					var memberTypeName = type?.GetMemberTypeName();
+					var valueTypeName = type?.GetValueType().ToString();
 
-					return (part, memberTypeName, typeName, type);
-				})
-				.Where(x => x.part != null && ((memberAtCursor.name != null && x.memberTypeName == memberAtCursor.name) || x.typeName == fieldTypeNameAtCursor))
-				.Select(x => GetPositionWithoutArrayBrackets(x.part, x.type));
+					return (valueTypePart, valueTypeName);
+				}).ToList().AsReadOnly();
 
-			var referencedMembers = members
-				.Select(member =>
-				{
-					var part = member.GetPart(ServicePartKind.Name);
-					var name = member.Name;
+			// will be null if the cursor is not on a field type name.
+			var fieldValueTypeNameAtCursor = fieldValueTypeParts
+				.Where(x => x.valueTypePart != null && requestPosition >= x.valueTypePart.Position && requestPosition < x.valueTypePart.EndPosition)
+				.Select(x => x.valueTypeName)
+				.FirstOrDefault();
 
-					return (part, name);
-				})
-				.Where(x => x.part != null && (x.name == fieldTypeNameAtCursor || x.name == memberAtCursor.name))
+			var referencedFields = fieldValueTypeParts
+				.Where(x => x.valueTypePart != null && ((memberNameAtCursor != null && x.valueTypeName == memberNameAtCursor) || (fieldValueTypeNameAtCursor != null && x.valueTypeName == fieldValueTypeNameAtCursor)))
+				.Select(x => x.valueTypePart);
+
+			var referencedMembers = memberParts
+				.Where(x => x.part != null && ((memberNameAtCursor != null && x.name == memberNameAtCursor) || (fieldValueTypeNameAtCursor != null && x.name == fieldValueTypeNameAtCursor)))
 				.Select(x => x.part);
 
 			return includeDeclaration
@@ -79,39 +67,38 @@ namespace Facility.LanguageServer
 				: referencedFields;
 		}
 
-		private static string GetMemberTypeName(this ServiceTypeInfo type)
+		public static ServicePart GetValueTypePart(string text, ServicePart part)
 		{
-			switch (type.Kind)
+			foreach (var (prefix, suffix) in s_templateTypePrefixSuffixes)
 			{
-				case ServiceTypeKind.Dto:
-					return type.Dto!.Name;
-				case ServiceTypeKind.ExternalDto:
-					return type.ExternalDto!.Name;
-				case ServiceTypeKind.Enum:
-					return type.Enum!.Name;
-				case ServiceTypeKind.ExternalEnum:
-					return type.ExternalEnum!.Name;
-				case ServiceTypeKind.Array:
-				case ServiceTypeKind.Result:
-				case ServiceTypeKind.Map:
-					return type.ValueType.GetMemberTypeName();
+				var valueType = TryPrefixSuffix(text, prefix, suffix);
+				if (valueType is not null)
+					return GetValueTypePart(valueType, TruncatePart(ServicePartKind.TypeName, part, prefix.Length, suffix.Length));
 			}
-			return null;
+
+			return part;
 		}
 
-		private static string GetFieldTypeName(this ServiceInfo service, ServiceFieldInfo field)
+		public static ServiceTypeInfo GetValueType(this ServiceTypeInfo type)
 		{
-			var type = service.GetFieldType(field);
-
-			while (type?.ValueType is { } valueType)
-				type = valueType;
-
-			return type?.ToString() ?? field.TypeName;
+			var valueType = type;
+			while (valueType?.ValueType is not null)
+				valueType = valueType.ValueType;
+			return valueType;
 		}
 
-		public static ServicePart GetPositionWithoutArrayBrackets(ServicePart part, ServiceTypeInfo type) =>
-			type.Kind == ServiceTypeKind.Array
-				? new ServicePart(part.Kind, part.Position, new ServiceDefinitionPosition(part.EndPosition.Name, part.EndPosition.LineNumber, part.EndPosition.ColumnNumber - 2))
-				: part;
+		private static ServicePart TruncatePart(ServicePartKind newKind, ServicePart part, int truncateLeft, int truncateRight) =>
+			new ServicePart(
+				newKind,
+				new ServiceDefinitionPosition(part.Position.Name, part.Position.LineNumber, part.Position.ColumnNumber + truncateLeft),
+				new ServiceDefinitionPosition(part.EndPosition.Name, part.EndPosition.LineNumber, part.EndPosition.ColumnNumber - truncateRight));
+
+		private static string TryPrefixSuffix(string text, string prefix, string suffix)
+		{
+			return text.StartsWith(prefix, StringComparison.Ordinal) && text.EndsWith(suffix, StringComparison.Ordinal) ?
+				text.Substring(prefix.Length, text.Length - prefix.Length - suffix.Length) : null;
+		}
+
+		private static readonly List<(string, string)> s_templateTypePrefixSuffixes = new() { ("", "[]"), ("nullable<", ">"), ("map<", ">"), ("result<", ">") };
 	}
 }
