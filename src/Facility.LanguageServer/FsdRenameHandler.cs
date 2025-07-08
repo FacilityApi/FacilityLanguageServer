@@ -67,7 +67,7 @@ internal sealed class FsdRenameHandler : FsdRequestHandler, IRenameHandler, IPre
 				var type = service.GetFieldType(field);
 				var valueType = type?.GetValueType();
 
-				if (type is null || valueTypePart is null || valueType is null || !s_isRenamable.Contains(valueType.Kind))
+				if (type is null || valueType is null || !s_isRenamable.Contains(valueType.Kind))
 					return null;
 
 				return new Range(new Position(valueTypePart.Position), new Position(valueTypePart.EndPosition));
