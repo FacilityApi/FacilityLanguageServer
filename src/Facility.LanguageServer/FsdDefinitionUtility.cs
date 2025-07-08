@@ -69,9 +69,7 @@ namespace Facility.LanguageServer
 
 		public static ServicePart GetValueTypePart(string text, ServicePart part)
 		{
-			var prefixSuffixTuples = new[] { ("", "[]"), ("nullable<", ">"), ("map<", ">"), ("result<", ">") };
-
-			foreach (var (prefix, suffix) in prefixSuffixTuples)
+			foreach (var (prefix, suffix) in s_templateTypePrefixSuffixes)
 			{
 				var valueType = TryPrefixSuffix(text, prefix, suffix);
 				if (valueType is not null)
@@ -100,5 +98,7 @@ namespace Facility.LanguageServer
 			return text.StartsWith(prefix, StringComparison.Ordinal) && text.EndsWith(suffix, StringComparison.Ordinal) ?
 				text.Substring(prefix.Length, text.Length - prefix.Length - suffix.Length) : null;
 		}
+
+		private static readonly List<(string, string)> s_templateTypePrefixSuffixes = new() { ("", "[]"), ("nullable<", ">"), ("map<", ">"), ("result<", ">") };
 	}
 }
