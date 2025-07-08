@@ -1,5 +1,9 @@
 # Release Notes
 
+## 2.5.1
+
+- Improve definition, references, and rename handlers for template types.
+
 ## 2.5.0
 
 - Add rename handler.

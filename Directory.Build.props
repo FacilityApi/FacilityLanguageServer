@@ -1,7 +1,7 @@
 <Project>
 
   <PropertyGroup>
-    <VersionPrefix>2.5.0</VersionPrefix>
+    <VersionPrefix>2.5.1</VersionPrefix>
     <LangVersion>11.0</LangVersion>
     <Nullable>warnings</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
