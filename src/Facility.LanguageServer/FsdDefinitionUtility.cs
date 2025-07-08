@@ -69,21 +69,14 @@ namespace Facility.LanguageServer
 
 		public static ServicePart GetValueTypePart(string text, ServicePart part)
 		{
-			var arrayValueType = TryPrefixSuffix(text, "", "[]");
-			if (arrayValueType is not null)
-				return GetValueTypePart(arrayValueType, TruncatePart(ServicePartKind.TypeName, part, 0, 2));
+			var prefixSuffixTuples = new[] { ("", "[]"), ("nullable<", ">"), ("map<", ">"), ("result<", ">") };
 
-			var nullableValueType = TryPrefixSuffix(text, "nullable<", ">");
-			if (nullableValueType is not null)
-				return GetValueTypePart(nullableValueType, TruncatePart(ServicePartKind.TypeName, part, 9, 1));
-
-			var mapValueType = TryPrefixSuffix(text, "map<", ">");
-			if (mapValueType is not null)
-				return GetValueTypePart(mapValueType, TruncatePart(ServicePartKind.TypeName, part, 4, 1));
-
-			var resultValueType = TryPrefixSuffix(text, "result<", ">");
-			if (resultValueType is not null)
-				return GetValueTypePart(resultValueType, TruncatePart(ServicePartKind.TypeName, part, 7, 1));
+			foreach (var (prefix, suffix) in prefixSuffixTuples)
+			{
+				var valueType = TryPrefixSuffix(text, prefix, suffix);
+				if (valueType is not null)
+					return GetValueTypePart(valueType, TruncatePart(ServicePartKind.TypeName, part, prefix.Length, suffix.Length));
+			}
 
 			return part;
 		}
