@@ -60,7 +60,7 @@ namespace Facility.LanguageServer
 
 			var referencedMembers = memberParts
 				.Where(x => x.part != null && ((memberNameAtCursor != null && x.name == memberNameAtCursor) || (fieldValueTypeNameAtCursor != null && x.name == fieldValueTypeNameAtCursor)))
-				.Select(x => GetValueTypePart(x.name, x.part));
+				.Select(x => x.part);
 
 			return includeDeclaration
 				? referencedFields.Concat(referencedMembers)
