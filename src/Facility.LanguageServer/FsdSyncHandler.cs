@@ -110,6 +110,9 @@ namespace Facility.LanguageServer
 			if (service != null && !HttpServiceInfo.TryCreate(service, out _, out errors))
 				diagnostics.AddRange(errors.Select(ToDiagnostic));
 
+			if (service != null)
+				diagnostics.AddRange(GetDiagnosticsForUnreferencedMembers(service));
+
 			SetService(documentUri, service);
 
 			Router.TextDocument.PublishDiagnostics(new PublishDiagnosticsParams
@@ -117,6 +120,40 @@ namespace Facility.LanguageServer
 				Uri = documentUri.ToUri(),
 				Diagnostics = diagnostics,
 			});
+		}
+
+		private static IReadOnlyList<Diagnostic> GetDiagnosticsForUnreferencedMembers(ServiceInfo service)
+		{
+			var diagnostics = new List<Diagnostic>();
+
+			var descendants = service.GetDescendants().ToList().AsReadOnly();
+
+			var members = new List<ServiceMemberInfo>()
+				.Concat(descendants.OfType<ServiceDtoInfo>())
+				.Concat(descendants.OfType<ServiceExternalDtoInfo>())
+				.Concat(descendants.OfType<ServiceEnumInfo>())
+				.Concat(descendants.OfType<ServiceExternalEnumInfo>())
+				.ToList()
+				.AsReadOnly();
+
+			foreach (var member in members)
+			{
+				var part = member.GetPart(ServicePartKind.Name);
+				if (part == null)
+					continue;
+
+				var references = service.GetReferencedServicePartsAtPosition(new Position(part.Position), false);
+				if (!references.Any())
+				{
+					diagnostics.Add(new Diagnostic
+					{
+						Severity = DiagnosticSeverity.Warning,
+						Message = $"'{member.Name}' is declared but never used.",
+						Range = new Range(new Position(part.Position), new Position(part.Position)),
+					});
+				}
+			}
+			return diagnostics;
 		}
 
 		private static Diagnostic ToDiagnostic(ServiceDefinitionError error) =>
