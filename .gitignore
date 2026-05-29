@@ -1,9 +1,6 @@
 .vs/
 .vscode/
-bin/
 cake/
-obj/
-release/
 
 *.cache
 *.ncrunchproject
@@ -17,4 +14,11 @@ nCrunchTemp*
 .DS_Store
 Thumbs.db
 *.log
+# END DO NOT EDIT
+
+# DO NOT EDIT: gitignore-dotnet convention
+artifacts/
+bin/
+obj/
+release/
 # END DO NOT EDIT
