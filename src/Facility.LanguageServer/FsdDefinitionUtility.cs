@@ -4,7 +4,7 @@ namespace Facility.LanguageServer
 {
 	internal static class FsdDefinitionUtility
 	{
-		public static ServiceMemberInfo GetMemberReferencedAtPosition(this ServiceInfo service, Position requestPosition)
+		public static ServiceMemberInfo? GetMemberReferencedAtPosition(this ServiceInfo service, Position requestPosition)
 		{
 			return (
 				from field in service.GetDescendants().OfType<ServiceFieldInfo>()
@@ -12,7 +12,7 @@ namespace Facility.LanguageServer
 				where part != null && requestPosition >= part.Position && requestPosition < part.EndPosition
 				let type = service.GetFieldType(field)
 				where type != null
-				let name = type.GetValueType().ToString()
+				let name = type.GetValueType()?.ToString()
 				where name != null
 				select service.FindMember(name)).FirstOrDefault();
 		}
@@ -40,10 +40,10 @@ namespace Facility.LanguageServer
 				.Select(field =>
 				{
 					var part = field.GetPart(ServicePartKind.TypeName);
-					var valueTypePart = GetValueTypePart(field.TypeName, part);
+					var valueTypePart = part is null ? null : GetValueTypePart(field.TypeName, part);
 
 					var type = service.GetFieldType(field);
-					var valueTypeName = type?.GetValueType().ToString();
+					var valueTypeName = type?.GetValueType()?.ToString();
 
 					return (valueTypePart, valueTypeName);
 				}).ToList().AsReadOnly();
@@ -56,11 +56,13 @@ namespace Facility.LanguageServer
 
 			var referencedFields = fieldValueTypeParts
 				.Where(x => x.valueTypePart != null && ((memberNameAtCursor != null && x.valueTypeName == memberNameAtCursor) || (fieldValueTypeNameAtCursor != null && x.valueTypeName == fieldValueTypeNameAtCursor)))
-				.Select(x => x.valueTypePart);
+				.Select(x => x.valueTypePart)
+				.OfType<ServicePart>();
 
 			var referencedMembers = memberParts
 				.Where(x => x.part != null && ((memberNameAtCursor != null && x.name == memberNameAtCursor) || (fieldValueTypeNameAtCursor != null && x.name == fieldValueTypeNameAtCursor)))
-				.Select(x => x.part);
+				.Select(x => x.part)
+				.OfType<ServicePart>();
 
 			return includeDeclaration
 				? referencedFields.Concat(referencedMembers)
@@ -79,7 +81,7 @@ namespace Facility.LanguageServer
 			return part;
 		}
 
-		public static ServiceTypeInfo GetValueType(this ServiceTypeInfo type)
+		public static ServiceTypeInfo? GetValueType(this ServiceTypeInfo type)
 		{
 			var valueType = type;
 			while (valueType?.ValueType is not null)
@@ -93,7 +95,7 @@ namespace Facility.LanguageServer
 				new ServiceDefinitionPosition(part.Position.Name, part.Position.LineNumber, part.Position.ColumnNumber + truncateLeft),
 				new ServiceDefinitionPosition(part.EndPosition.Name, part.EndPosition.LineNumber, part.EndPosition.ColumnNumber - truncateRight));
 
-		private static string TryPrefixSuffix(string text, string prefix, string suffix)
+		private static string? TryPrefixSuffix(string text, string prefix, string suffix)
 		{
 			return text.StartsWith(prefix, StringComparison.Ordinal) && text.EndsWith(suffix, StringComparison.Ordinal) ?
 				text.Substring(prefix.Length, text.Length - prefix.Length - suffix.Length) : null;

@@ -29,7 +29,7 @@ namespace Facility.LanguageServer
 			var documentUri = request.TextDocument.Uri;
 			var service = GetService(documentUri);
 			if (service == null)
-				return null;
+				return new LocationContainer();
 
 			var position = new Position(request.Position);
 
@@ -38,7 +38,7 @@ namespace Facility.LanguageServer
 			var locations = serviceParts.Select(part => new Location()
 			{
 				Uri = documentUri,
-				Range = new Range(new Position(part!.Position), new Position(part.EndPosition)),
+				Range = new Range(new Position(part.Position), new Position(part.EndPosition)),
 			});
 
 			return new LocationContainer(locations);

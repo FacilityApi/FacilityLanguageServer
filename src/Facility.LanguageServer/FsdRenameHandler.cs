@@ -25,12 +25,12 @@ internal sealed class FsdRenameHandler : FsdRequestHandler, IRenameHandler, IPre
 			PrepareProvider = true,
 		};
 
-	public Task<RangeOrPlaceholderRange> Handle(PrepareRenameParams request, CancellationToken cancellationToken)
+	public Task<RangeOrPlaceholderRange?> Handle(PrepareRenameParams request, CancellationToken cancellationToken)
 	{
 		var documentUri = request.TextDocument.Uri;
 		var service = GetService(documentUri);
 		if (service == null)
-			return Task.FromResult<RangeOrPlaceholderRange>(null);
+			return Task.FromResult<RangeOrPlaceholderRange?>(null);
 
 		var members = new List<ServiceMemberInfo>();
 		members.AddRange(service.GetDescendants().OfType<ServiceDtoInfo>());
@@ -50,7 +50,7 @@ internal sealed class FsdRenameHandler : FsdRequestHandler, IRenameHandler, IPre
 			.FirstOrDefault(range => range != null && request.Position >= range.Start && request.Position < range.End);
 
 		if (memberRangeAtCursor is not null)
-			return Task.FromResult<RangeOrPlaceholderRange>(memberRangeAtCursor);
+			return Task.FromResult<RangeOrPlaceholderRange?>(memberRangeAtCursor);
 
 		var fields = service.GetDescendants().OfType<ServiceFieldInfo>().ToList().AsReadOnly();
 
@@ -75,12 +75,12 @@ internal sealed class FsdRenameHandler : FsdRequestHandler, IRenameHandler, IPre
 			.FirstOrDefault(range => range != null && request.Position >= range.Start && request.Position < range.End);
 
 		if (fieldRangeAtCursor is not null)
-			return Task.FromResult<RangeOrPlaceholderRange>(fieldRangeAtCursor);
+			return Task.FromResult<RangeOrPlaceholderRange?>(fieldRangeAtCursor);
 
-		return Task.FromResult<RangeOrPlaceholderRange>(null);
+		return Task.FromResult<RangeOrPlaceholderRange?>(null);
 	}
 
-	public async Task<WorkspaceEdit> Handle(RenameParams request, CancellationToken cancellationToken)
+	public async Task<WorkspaceEdit?> Handle(RenameParams request, CancellationToken cancellationToken)
 	{
 		var documentUri = request.TextDocument.Uri;
 		var service = GetService(documentUri);
@@ -92,7 +92,7 @@ internal sealed class FsdRenameHandler : FsdRequestHandler, IRenameHandler, IPre
 		var serviceParts = service.GetReferencedServicePartsAtPosition(position, true);
 
 		var ranges = serviceParts
-			.Select(part => new Range(new Position(part!.Position), new Position(part.EndPosition)))
+			.Select(part => new Range(new Position(part.Position), new Position(part.EndPosition)))
 			.ToList();
 
 		var changes = new Dictionary<DocumentUri, IEnumerable<TextEdit>>();

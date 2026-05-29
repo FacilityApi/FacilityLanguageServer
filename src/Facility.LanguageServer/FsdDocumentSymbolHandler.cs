@@ -19,7 +19,7 @@ namespace Facility.LanguageServer
 			var documentUri = request.TextDocument.Uri;
 			var service = GetService(documentUri);
 			if (service == null)
-				return null;
+				return new SymbolInformationOrDocumentSymbolContainer();
 
 			var symbols = service.GetServiceSymbols();
 			return symbols;

@@ -33,7 +33,12 @@ namespace Facility.LanguageServer
 			m_services[documentUri] = service;
 		}
 
-		protected ServiceInfo GetService(DocumentUri documentUri)
+		protected void RemoveService(DocumentUri documentUri)
+		{
+			m_services.Remove(documentUri);
+		}
+
+		protected ServiceInfo? GetService(DocumentUri documentUri)
 		{
 			return m_services.TryGetValue(documentUri, out var service) ? service : null;
 		}

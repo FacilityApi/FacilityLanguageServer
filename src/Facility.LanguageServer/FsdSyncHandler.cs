@@ -57,7 +57,7 @@ namespace Facility.LanguageServer
 
 		public async Task<Unit> Handle(DidCloseTextDocumentParams notification, CancellationToken cancellationToken)
 		{
-			SetService(notification.TextDocument.Uri, null);
+			RemoveService(notification.TextDocument.Uri);
 
 			return Unit.Value;
 		}
@@ -110,7 +110,10 @@ namespace Facility.LanguageServer
 			if (service != null && !HttpServiceInfo.TryCreate(service, out _, out errors))
 				diagnostics.AddRange(errors.Select(ToDiagnostic));
 
-			SetService(documentUri, service);
+			if (service is null)
+				RemoveService(documentUri);
+			else
+				SetService(documentUri, service);
 
 			Router.TextDocument.PublishDiagnostics(new PublishDiagnosticsParams
 			{
@@ -124,8 +127,11 @@ namespace Facility.LanguageServer
 			{
 				Severity = DiagnosticSeverity.Error,
 				Message = error.Message,
-				Range = new Range(new Position(error.Position), new Position(error.Position)),
+				Range = new Range(ToPosition(error.Position), ToPosition(error.Position)),
 			};
+
+		private static Position ToPosition(ServiceDefinitionPosition? position) =>
+			position is null ? default : new Position(position);
 
 		private readonly FsdParser m_parser;
 	}

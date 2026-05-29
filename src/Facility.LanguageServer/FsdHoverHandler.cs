@@ -29,7 +29,7 @@ namespace Facility.LanguageServer
 		{
 		}
 
-		public async Task<Hover> Handle(HoverParams request, CancellationToken cancellationToken)
+		public async Task<Hover?> Handle(HoverParams request, CancellationToken cancellationToken)
 		{
 			var documentUri = request.TextDocument.Uri;
 			var service = GetService(documentUri);
