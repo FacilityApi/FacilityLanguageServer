@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="src/Facility.LanguageServer/Facility.LanguageServer.csproj" />
+  <Project Path="tools/Build/Build.csproj" />
+</Solution>

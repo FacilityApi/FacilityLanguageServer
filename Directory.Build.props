@@ -1,41 +1,48 @@
 <Project>
 
   <PropertyGroup>
-    <VersionPrefix>2.5.1</VersionPrefix>
-    <LangVersion>11.0</LangVersion>
-    <Nullable>warnings</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <NeutralLanguage>en-US</NeutralLanguage>
+    <VersionPrefix>2.5.2</VersionPrefix>
+    <PackageValidationBaselineVersion>2.5.1</PackageValidationBaselineVersion>
+    <RestoreSources>https://api.nuget.org/v3/index.json</RestoreSources>
     <NoWarn>$(NoWarn);1591;1998;NU5105</NoWarn>
-    <DebugType>embedded</DebugType>
+    <Authors>Ed Ball, Dave Dunkin</Authors>
+  </PropertyGroup>
+
+  <!-- DO NOT EDIT: facility-dotnet-package-props convention -->
+  <PropertyGroup>
     <GitHubOrganization>FacilityApi</GitHubOrganization>
     <RepositoryName>FacilityLanguageServer</RepositoryName>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/$(GitHubOrganization)/$(RepositoryName)</PackageProjectUrl>
-    <PackageReleaseNotes>https://github.com/$(GitHubOrganization)/$(RepositoryName)/blob/master/ReleaseNotes.md</PackageReleaseNotes>
+  </PropertyGroup>
+  <!-- END DO NOT EDIT -->
+
+  <!-- DO NOT EDIT: dotnet-common-props convention -->
+  <PropertyGroup>
+    <LangVersion>14.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <DebugType>embedded</DebugType>
+    <PackageProjectUrl Condition=" '$(PackageProjectUrl)' == '' ">https://github.com/$(GitHubOrganization)/$(RepositoryName)</PackageProjectUrl>
+    <PackageReleaseNotes Condition=" '$(PackageReleaseNotes)' == '' ">https://github.com/$(GitHubOrganization)/$(RepositoryName)/blob/master/ReleaseNotes.md</PackageReleaseNotes>
     <RepositoryUrl>https://github.com/$(GitHubOrganization)/$(RepositoryName).git</RepositoryUrl>
-    <Authors>Ed Ball, Dave Dunkin</Authors>
+    <Authors Condition=" '$(Authors)' == '' ">$(GitHubOrganization)</Authors>
     <Copyright>Copyright $(Authors)</Copyright>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
-    <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+    <AnalysisLevel>latest-all</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <IsPackable>false</IsPackable>
     <IsTestProject>false</IsTestProject>
+    <SelfContained>false</SelfContained>
+    <UseArtifactsOutput>true</UseArtifactsOutput>
+    <EnableStrictModeForCompatibleFrameworksInPackageValidation>true</EnableStrictModeForCompatibleFrameworksInPackageValidation>
+    <EnableStrictModeForCompatibleTfms>true</EnableStrictModeForCompatibleTfms>
+    <DisablePackageBaselineValidation Condition=" $(PackageValidationBaselineVersion) == $(VersionPrefix) or $(PackageValidationBaselineVersion) == '0.0.0' ">true</DisablePackageBaselineValidation>
+    <NuGetAudit>true</NuGetAudit>
+    <NuGetAuditMode>all</NuGetAuditMode>
+    <NuGetAuditLevel>low</NuGetAuditLevel>
   </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(BuildNumber)' != '' ">
-    <AssemblyVersion>$(VersionPrefix).$(BuildNumber)</AssemblyVersion>
-    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Faithlife.Analyzers" Version="1.4.0" PrivateAssets="All" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.507" PrivateAssets="All" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
-  </ItemGroup>
-
+  <!-- END DO NOT EDIT -->
 </Project>

@@ -20,7 +20,7 @@ namespace Facility.LanguageServer
 			Character = position.Character;
 		}
 
-		public override bool Equals(object obj)
+		public override bool Equals(object? obj)
 		{
 			if (obj is Position p)
 				return this == p;
@@ -55,16 +55,16 @@ namespace Facility.LanguageServer
 
 		public static bool operator <=(Position a, Position b) => a < b || a == b;
 
-		public static bool operator ==(Position a, ServiceDefinitionPosition b) => b != null && a == new Position(b);
+		public static bool operator ==(Position a, ServiceDefinitionPosition? b) => b != null && a == new Position(b);
 
-		public static bool operator !=(Position a, ServiceDefinitionPosition b) => b == null || a != new Position(b);
+		public static bool operator !=(Position a, ServiceDefinitionPosition? b) => b == null || a != new Position(b);
 
-		public static bool operator >(Position a, ServiceDefinitionPosition b) => b == null || a > new Position(b);
+		public static bool operator >(Position a, ServiceDefinitionPosition? b) => b == null || a > new Position(b);
 
-		public static bool operator >=(Position a, ServiceDefinitionPosition b) => b == null || a >= new Position(b);
+		public static bool operator >=(Position a, ServiceDefinitionPosition? b) => b == null || a >= new Position(b);
 
-		public static bool operator <(Position a, ServiceDefinitionPosition b) => b != null && a < new Position(b);
+		public static bool operator <(Position a, ServiceDefinitionPosition? b) => b != null && a < new Position(b);
 
-		public static bool operator <=(Position a, ServiceDefinitionPosition b) => b != null && a <= new Position(b);
+		public static bool operator <=(Position a, ServiceDefinitionPosition? b) => b != null && a <= new Position(b);
 	}
 }

@@ -35,7 +35,7 @@ namespace Facility.LanguageServer
 			var documentUri = request.TextDocument.Uri;
 			var service = GetService(documentUri);
 			if (service == null)
-				return null;
+				return new LocationOrLocationLinks();
 
 			var member = service.GetMemberReferencedAtPosition(new Position(request.Position));
 			if (member?.Position != null)

@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  push:
+    paths-ignore:
+    - '*.md'
+    branches:
+    - master
+    tags:
+    - 'v*'
+  pull_request:
+    paths-ignore:
+    - '*.md'
+  release:
+    types:
+    - created
+
+env:
+  DOTNET_NOLOGO: 1
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+
+defaults:
+  run:
+    shell: pwsh
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+        - ubuntu-latest
+        - windows-latest
+        - macos-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+    - name: Install .NET
+      uses: actions/setup-dotnet@v5
+    - name: Restore
+      run: ./build.ps1 restore
+    - name: Build
+      run: ./build.ps1 build --skip restore
+    - name: Package
+      if: runner.os == 'Windows'
+      run: ./build.ps1 package --skip build
+    - name: Upload package artifacts
+      if: runner.os == 'Windows'
+      uses: actions/upload-artifact@v7
+      with:
+        name: FacilityLanguageServer
+        path: release/*.zip
+    - name: Upload release assets
+      if: runner.os == 'Windows' && github.event_name == 'release' && startsWith(github.ref, 'refs/tags/')
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: gh release upload ${{ github.event.release.tag_name }} release/*.zip

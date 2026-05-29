@@ -1,16 +1,10 @@
+using System.IO.Compression;
+
 return BuildRunner.Execute(args, build =>
 {
-	var gitLogin = new GitLoginInfo("FacilityApiBot", Environment.GetEnvironmentVariable("BUILD_BOT_PASSWORD") ?? "");
-
 	var dotNetBuildSettings = new DotNetBuildSettings
 	{
 		NuGetApiKey = Environment.GetEnvironmentVariable("NUGET_API_KEY"),
-		DocsSettings = new DotNetDocsSettings
-		{
-			GitLogin = gitLogin,
-			GitAuthor = new GitAuthorInfo("FacilityApiBot", "facilityapi@gmail.com"),
-			SourceCodeUrl = "https://github.com/FacilityApi/FacilityLanguageServer/tree/master/src",
-		},
 	};
 
 	build.AddDotNetTargets(dotNetBuildSettings);
@@ -20,7 +14,30 @@ return BuildRunner.Execute(args, build =>
 		.ClearActions()
 		.Does(() =>
 		{
-			RunDotNet("publish", "--configuration", "Release", "src/Facility.LanguageServer/Facility.LanguageServer.csproj");
-			RunDotNet("publish", "--configuration", "Release", "--runtime", "win-x64", "-p:PublishSingleFile=true", "--self-contained", "false", "src/Facility.LanguageServer/Facility.LanguageServer.csproj");
+			var releasePath = Path.Combine(Environment.CurrentDirectory, "release");
+			var frameworkPublishPath = Path.Combine(releasePath, "Facility.LanguageServer");
+			var windowsPublishPath = Path.Combine(releasePath, "Facility.LanguageServer-win-x64");
+
+			Directory.CreateDirectory(releasePath);
+			Publish(frameworkPublishPath);
+			Publish(windowsPublishPath, "--runtime", "win-x64", "-p:PublishSingleFile=true", "--self-contained", "false");
+			Zip(frameworkPublishPath, Path.Combine(releasePath, "Facility.LanguageServer.zip"));
+			Zip(windowsPublishPath, Path.Combine(releasePath, "Facility.LanguageServer-win-x64.zip"));
 		});
+
+	void Publish(string outputPath, params string[] args)
+	{
+		if (Directory.Exists(outputPath))
+			Directory.Delete(outputPath, recursive: true);
+
+		RunDotNet(new[] { "publish", "--configuration", "Release", "--output", outputPath, "src/Facility.LanguageServer/Facility.LanguageServer.csproj" }.Concat(args));
+	}
+
+	static void Zip(string sourceDirectory, string zipPath)
+	{
+		if (File.Exists(zipPath))
+			File.Delete(zipPath);
+
+		ZipFile.CreateFromDirectory(sourceDirectory, zipPath);
+	}
 });

@@ -1,0 +1,6 @@
+conventions:
+  - path: FacilityApi/Facility/conventions/facility-dotnet-package
+
+pull-request:
+  reviewers:
+    - ejball

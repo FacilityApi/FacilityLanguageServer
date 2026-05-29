@@ -1,5 +1,11 @@
 # Release Notes
 
+## 2.5.2
+
+- Target .NET 8.
+- Update Facility dependency.
+- Update Newtonsoft.Json dependency.
+
 ## 2.5.1
 
 - Improve definition, references, and rename handlers for template types.

@@ -2,8 +2,6 @@
 
 Language Server Protocol server for the [Facility API Framework](https://facilityapi.github.io/).
 
-[![Build](https://github.com/FacilityApi/FacilityLanguageServer/workflows/Build/badge.svg)](https://github.com/FacilityApi/FacilityLanguageServer/actions?query=workflow%3ABuild)
-
 ## Facility.LanguageServer
 
 Language server for Facility Service Definition documents.
