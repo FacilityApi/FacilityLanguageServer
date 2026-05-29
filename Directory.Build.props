@@ -38,4 +38,11 @@
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.507" PrivateAssets="All" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
   </ItemGroup>
 
+  <!-- DO NOT EDIT: facility-dotnet-package-props convention -->
+  <PropertyGroup>
+    <GitHubOrganization>FacilityApi</GitHubOrganization>
+    <RepositoryName>FacilityLanguageServer</RepositoryName>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+  <!-- END DO NOT EDIT -->
 </Project>
