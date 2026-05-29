@@ -1,12 +1,8 @@
-.vs/
 .vscode/
 cake/
 
-*.cache
 *.ncrunchproject
 *.ncrunchsolution
-*.user
-*.userprefs
 launchSettings.json
 nCrunchTemp*
 
@@ -21,4 +17,13 @@ artifacts/
 bin/
 obj/
 release/
+# END DO NOT EDIT
+
+# DO NOT EDIT: gitignore-ide convention
+.vs/
+.idea/
+*.cache
+*.user
+*.userprefs
+_ReSharper*
 # END DO NOT EDIT
