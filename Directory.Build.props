@@ -5,16 +5,11 @@
     <PackageValidationBaselineVersion>2.5.1</PackageValidationBaselineVersion>
     <RestoreSources>https://api.nuget.org/v3/index.json</RestoreSources>
     <NoWarn>$(NoWarn);1591;1998;NU5105</NoWarn>
-    <Authors>Ed Ball, Dave Dunkin</Authors>
-  </PropertyGroup>
-
-  <!-- DO NOT EDIT: facility-dotnet-package-props convention -->
-  <PropertyGroup>
     <GitHubOrganization>FacilityApi</GitHubOrganization>
     <RepositoryName>FacilityLanguageServer</RepositoryName>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Authors>Ed Ball, Dave Dunkin</Authors>
   </PropertyGroup>
-  <!-- END DO NOT EDIT -->
 
   <!-- DO NOT EDIT: dotnet-common-props convention -->
   <PropertyGroup>
