@@ -5,5 +5,4 @@ conventions:
         - packages: [OmniSharp.Extensions.LanguageServer]
           version: "0.19.7"
 pull-request:
-  reviewers:
-    - ejball
+  reviewers: [ejball]
