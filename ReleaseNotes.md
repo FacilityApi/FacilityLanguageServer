@@ -1,5 +1,9 @@
 # Release Notes
 
+## 2.5.3
+
+- Update dependencies.
+
 ## 2.5.2
 
 - Target .NET 8.
