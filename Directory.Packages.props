@@ -6,15 +6,13 @@
     <CentralPackageFloatingVersionsEnabled>true</CentralPackageFloatingVersionsEnabled>
   </PropertyGroup>
   <!-- END DO NOT EDIT -->
-
   <ItemGroup>
-    <PackageVersion Include="Facility.Definition" Version="2.18.1" />
+    <PackageVersion Include="Facility.Definition" Version="2.19.0" />
     <PackageVersion Include="Faithlife.Build" Version="5.*" />
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="10.0.8" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageVersion Include="OmniSharp.Extensions.LanguageServer" Version="0.19.7" />
   </ItemGroup>
-
   <!-- DO NOT EDIT: dotnet-common-props/analyzers convention -->
   <ItemGroup>
     <GlobalPackageReference Include="Faithlife.Analyzers" Version="1.*" />
