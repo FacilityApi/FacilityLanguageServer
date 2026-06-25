@@ -1,7 +1,7 @@
 <Project>
 
   <PropertyGroup>
-    <VersionPrefix>2.5.3</VersionPrefix>
+    <VersionPrefix>2.5.4</VersionPrefix>
     <PackageValidationBaselineVersion>2.5.2</PackageValidationBaselineVersion>
     <RestoreSources>https://api.nuget.org/v3/index.json</RestoreSources>
     <NoWarn>$(NoWarn);1591;1998;NU5105</NoWarn>
