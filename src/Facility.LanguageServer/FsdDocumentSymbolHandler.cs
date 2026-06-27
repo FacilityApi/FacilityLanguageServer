@@ -25,8 +25,8 @@ namespace Facility.LanguageServer
 			return symbols;
 		}
 
-		public DocumentSymbolRegistrationOptions GetRegistrationOptions(DocumentSymbolCapability capability, ClientCapabilities clientCapabilities)
-			=> new()
+		public DocumentSymbolRegistrationOptions GetRegistrationOptions(DocumentSymbolCapability capability, ClientCapabilities clientCapabilities) =>
+			new()
 			{
 				DocumentSelector = DocumentSelector.ForLanguage("fsd"),
 			};
