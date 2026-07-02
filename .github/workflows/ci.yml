@@ -88,8 +88,37 @@ jobs:
       with:
         name: FacilityLanguageServer
         path: release
+    - name: Snapshot tags before publish
+      run: |
+        git fetch --force --tags origin
+        git tag --points-at $env:GITHUB_SHA | Sort-Object | Set-Content "$env:RUNNER_TEMP/tags-before.txt"
     - name: Publish
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
       run: ./build.ps1 publish --skip package --trigger publish-nuget-output
+    - name: Detect tags pushed by publish
+      id: detect_tags
+      run: |
+        $before = @(Get-Content "$env:RUNNER_TEMP/tags-before.txt" -ErrorAction SilentlyContinue)
+        git fetch --force --tags origin
+        $after = @(git tag --points-at $env:GITHUB_SHA | Sort-Object)
+        $newTags = @(Compare-Object -ReferenceObject $before -DifferenceObject $after -PassThru |
+          Where-Object { $_ -in $after })
+
+        if ($newTags.Count -gt 0) {
+          $tag = $newTags[0]
+          "tag=$tag" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          Write-Host "New tag pushed: $tag"
+        }
+        else {
+          "tag=" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          Write-Host "No new tag was pushed by publish."
+        }
+    - name: Create release for new tag
+      if: steps.detect_tags.outputs.tag != ''
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        NEW_TAG: ${{ steps.detect_tags.outputs.tag }}
+      run: |
+        gh release create $env:NEW_TAG release/*.zip --target $env:GITHUB_SHA --generate-notes
