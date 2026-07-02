@@ -29,7 +29,7 @@ return BuildRunner.Execute(args, build =>
 		if (Directory.Exists(outputPath))
 			Directory.Delete(outputPath, recursive: true);
 
-		RunDotNet(new[] { "publish", "--configuration", dotNetBuildSettings.GetConfiguration(), "--no-build", "--output", outputPath, "src/Facility.LanguageServer/Facility.LanguageServer.csproj" }.Concat(args));
+		RunDotNet(new[] { "publish", "--configuration", dotNetBuildSettings.GetConfiguration(), "--output", outputPath, "src/Facility.LanguageServer/Facility.LanguageServer.csproj" }.Concat(args));
 	}
 
 	static void Zip(string sourceDirectory, string zipPath)
