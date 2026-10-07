@@ -1,5 +1,9 @@
 # Release Notes
 
+## 2.5.4
+
+- Package Facility.LanguageServer as a .NET tool and publish a NuGet package during releases.
+
 ## 2.5.3
 
 - Update dependencies.
