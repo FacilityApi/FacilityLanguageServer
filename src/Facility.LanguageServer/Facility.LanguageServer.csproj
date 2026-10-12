@@ -3,11 +3,23 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
+    <IsPackable>true</IsPackable>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>facility-language-server</ToolCommandName>
+    <Description>Language Server Protocol server for Facility Service Definition documents.</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>facility;language-server;lsp</PackageTags>
+    <PackageValidationBaselineVersion>0.0.0</PackageValidationBaselineVersion>
+    <RollForward>Major</RollForward>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Facility.Definition" />
     <PackageReference Include="Microsoft.Extensions.Logging" />
     <PackageReference Include="OmniSharp.Extensions.LanguageServer" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="/" />
   </ItemGroup>
 </Project>
