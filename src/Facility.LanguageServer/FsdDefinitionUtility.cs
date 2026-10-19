@@ -97,8 +97,9 @@ namespace Facility.LanguageServer
 
 		private static string? TryPrefixSuffix(string text, string prefix, string suffix)
 		{
-			return text.StartsWith(prefix, StringComparison.Ordinal) && text.EndsWith(suffix, StringComparison.Ordinal) ?
-				text.Substring(prefix.Length, text.Length - prefix.Length - suffix.Length) : null;
+			return text.StartsWith(prefix, StringComparison.Ordinal) && text.EndsWith(suffix, StringComparison.Ordinal)
+				? text.Substring(prefix.Length, text.Length - prefix.Length - suffix.Length)
+				: null;
 		}
 
 		private static readonly List<(string, string)> s_templateTypePrefixSuffixes = new() { ("", "[]"), ("nullable<", ">"), ("map<", ">"), ("result<", ">") };

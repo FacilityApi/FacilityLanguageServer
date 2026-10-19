@@ -39,30 +39,30 @@ namespace Facility.LanguageServer
 			return new TextDocumentAttributes(uri, "fsd");
 		}
 
-		public async Task<Unit> Handle(DidOpenTextDocumentParams notification, CancellationToken cancellationToken)
+		public async Task<Unit> Handle(DidOpenTextDocumentParams request, CancellationToken cancellationToken)
 		{
-			await ParseAsync(notification.TextDocument.Uri, notification.TextDocument.Text).ConfigureAwait(false);
-			await Configuration.GetScopedConfiguration(notification.TextDocument.Uri, cancellationToken).ConfigureAwait(false);
+			await ParseAsync(request.TextDocument.Uri, request.TextDocument.Text).ConfigureAwait(false);
+			await Configuration.GetScopedConfiguration(request.TextDocument.Uri, cancellationToken).ConfigureAwait(false);
 			return Unit.Value;
 		}
 
-		public async Task<Unit> Handle(DidChangeTextDocumentParams notification, CancellationToken cancellationToken)
+		public async Task<Unit> Handle(DidChangeTextDocumentParams request, CancellationToken cancellationToken)
 		{
-			foreach (var change in notification.ContentChanges)
+			foreach (var change in request.ContentChanges)
 			{
-				await ParseAsync(notification.TextDocument.Uri, change.Text).ConfigureAwait(false);
+				await ParseAsync(request.TextDocument.Uri, change.Text).ConfigureAwait(false);
 			}
 			return Unit.Value;
 		}
 
-		public async Task<Unit> Handle(DidCloseTextDocumentParams notification, CancellationToken cancellationToken)
+		public async Task<Unit> Handle(DidCloseTextDocumentParams request, CancellationToken cancellationToken)
 		{
-			RemoveService(notification.TextDocument.Uri);
+			RemoveService(request.TextDocument.Uri);
 
 			return Unit.Value;
 		}
 
-		public async Task<Unit> Handle(DidSaveTextDocumentParams notification, CancellationToken cancellationToken)
+		public async Task<Unit> Handle(DidSaveTextDocumentParams request, CancellationToken cancellationToken)
 		{
 			return Unit.Value;
 		}

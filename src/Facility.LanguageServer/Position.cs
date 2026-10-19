@@ -36,9 +36,7 @@ namespace Facility.LanguageServer
 
 		public int CompareTo(Position other)
 		{
-			return this < other ? -1 :
-				this == other ? 0 :
-				1;
+			return this < other ? -1 : this == other ? 0 : 1;
 		}
 
 		public static implicit operator LspPosition(Position position) => new LspPosition(position.Line, position.Character);
