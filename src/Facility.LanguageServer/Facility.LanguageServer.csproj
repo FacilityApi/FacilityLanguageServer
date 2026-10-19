@@ -11,6 +11,8 @@
     <PackageTags>facility;language-server;lsp</PackageTags>
     <PackageValidationBaselineVersion>0.0.0</PackageValidationBaselineVersion>
     <RollForward>Major</RollForward>
+    <LangVersion>preview</LangVersion>
+    <Features>FileBasedProgram</Features>
   </PropertyGroup>
 
   <ItemGroup>
