@@ -10,8 +10,7 @@ return BuildRunner.Execute(args, build =>
 	build.AddDotNetTargets(dotNetBuildSettings);
 
 	build.Target("package")
-		.Describe("Builds the publishable output")
-		.ClearActions()
+		.Describe("Creates NuGet packages and release zips")
 		.Does(() =>
 		{
 			var releasePath = Path.Combine(Environment.CurrentDirectory, "release");
@@ -30,7 +29,7 @@ return BuildRunner.Execute(args, build =>
 		if (Directory.Exists(outputPath))
 			Directory.Delete(outputPath, recursive: true);
 
-		RunDotNet(new[] { "publish", "--configuration", "Release", "--output", outputPath, "src/Facility.LanguageServer/Facility.LanguageServer.csproj" }.Concat(args));
+		RunDotNet(new[] { "publish", "--configuration", dotNetBuildSettings.GetConfiguration(), "--output", outputPath, "src/Facility.LanguageServer/Facility.LanguageServer.csproj" }.Concat(args));
 	}
 
 	static void Zip(string sourceDirectory, string zipPath)
