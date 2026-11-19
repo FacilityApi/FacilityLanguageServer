@@ -1,9 +1,15 @@
+#:project Facility.LanguageServer.csproj
+using System.Runtime.CompilerServices;
 using Facility.Definition;
 using Facility.LanguageServer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Server;
+
+[assembly: InternalsVisibleTo("dnx")]
+[assembly: InternalsVisibleTo("runfile")]
+[assembly: InternalsVisibleTo("Program")]
 
 ////while (!System.Diagnostics.Debugger.IsAttached)
 ////{
